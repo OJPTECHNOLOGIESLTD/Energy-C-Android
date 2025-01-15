@@ -78,7 +78,7 @@ class StartRecyclingWaste extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RecyclingPage(wasteType: wasteTypeTitle), // Pass waste type title
+        builder: (context) => RecyclingPage(wasteType: wasteTypeTitle, actionType1: false,), // Pass waste type title
       ),
     );
     print("Recycling item: $index");

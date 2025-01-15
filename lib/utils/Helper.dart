@@ -244,39 +244,43 @@ class RecyclingScheduleProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.location_on, color: Customcolors.teal),
-                SizedBox(width: 8),
-                Text(
-                  '- - - - - - - - - - - - - - -',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Customcolors.teal,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          SizedBox(height: 30,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.location_on, color: Customcolors.teal),
+                  SizedBox(width: 8),
+                  Text(
+                    '- - - - - - - - - - - - -',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Customcolors.teal,
+                    ),
                   ),
-                ),
-                Icon(Icons.edit, color: isReviewing ? Customcolors.teal : Colors.grey),
-                Text(
-                  '- - - - - - - - - - - - - - -',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Customcolors.teal,
+                  Icon(Icons.edit, color: isReviewing ? Customcolors.teal : Colors.grey),
+                  Text(
+                    '- - - - - - - - - - - - -',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Customcolors.teal,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Icon(Icons.check_circle, color: isCompleted ? Customcolors.teal : Colors.grey),
-          ],
-        ),
-        SizedBox(height: 50),
-      ],
+                ],
+              ),
+              Icon(Icons.check_circle, color: isCompleted ? Customcolors.teal : Colors.grey),
+            ],
+          ),
+          SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }

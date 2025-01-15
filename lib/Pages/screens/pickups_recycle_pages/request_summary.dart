@@ -1,6 +1,8 @@
+import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/home_pickup.dart';
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/recyclingpage.dart';
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/waste_info.dart';
 import 'package:energy_chleen/utils/Helper.dart';
+import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +18,9 @@ class _RequestSummaryState extends State<RequestSummary> {
   int? weight;
   int? estPrice;
   DateTime? pickupDate;
+  TextEditingController _pickupAddressController = TextEditingController();
+  TextEditingController _cityController = TextEditingController();
+  TextEditingController _stateController = TextEditingController();
 
   @override
   void initState() {
@@ -24,13 +29,23 @@ class _RequestSummaryState extends State<RequestSummary> {
   }
 
   Future<void> _loadScheduleData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    StorageService storageService = StorageService();
+    // Load pickup details
+    Map<String, dynamic> pickupDetails =
+        await storageService.loadPickupDetails();
     setState(() {
-      wasteType = prefs.getString('wasteType');
-      weight = prefs.getInt('weight');
-      estPrice = prefs.getInt('estPrice');
-      // Set a hardcoded pickup date for now or retrieve from SharedPreferences
-      pickupDate = DateTime.now(); // Use your logic to set this date
+      _pickupAddressController.text = pickupDetails['pickupAddress'] ?? '';
+      _cityController.text = pickupDetails['city'] ?? '';
+      _stateController.text = pickupDetails['state'] ?? '';
+      pickupDate = pickupDetails['pickupDate'];
+    });
+
+    // Load waste details
+    Map<String, dynamic> wasteDetails = await storageService.loadWasteDetails();
+    setState(() {
+      wasteType = wasteDetails['wasteType'];
+      weight = wasteDetails['weight'];
+      estPrice = wasteDetails['estPrice'];
     });
   }
 
@@ -51,7 +66,8 @@ class _RequestSummaryState extends State<RequestSummary> {
           ),
           child: IconButton(
             tooltip: 'Go back',
-            icon: Icon(Icons.arrow_back_ios, size: 18, color: Customcolors.white),
+            icon:
+                Icon(Icons.arrow_back_ios, size: 18, color: Customcolors.white),
             onPressed: () => Navigator.pop(context), // Navigate back
           ),
         ),
@@ -62,19 +78,88 @@ class _RequestSummaryState extends State<RequestSummary> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      body: Column(
-        children: [
-          RecyclingScheduleProgress(isReviewing: true, isCompleted: false),
-          _buildWasteTypeAndDetails(),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            RecyclingScheduleProgress(isReviewing: true, isCompleted: false),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Pickup Address',
+                        style: TextStyle(
+                            color: Customcolors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                      TextButton(
+                          onPressed: () {
+  debugPrint('Navigating to HomePickupDetails...');
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => HomePickupDetails(),
+    ),
+  );
+},
+
+                          child: Text(
+                            'Change',
+                            style: TextStyle(color: Colors.grey),
+                          )),
+                    ],
+                  ),
+                  // this text is for displaying the pickup address
+                  Text('${_pickupAddressController.text} ${_cityController.text} ${_stateController.text}')
+
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Waste Type',
+                  style: TextStyle(
+                      color: Customcolors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _showWasteTypeDialog();
+                  },
+                  child: Text(
+                    'Add +',
+                    style: TextStyle(
+                        color: Customcolors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
+                  ), //add a fresh/new wasteType to list that will be recycled
+                ),
+              ],
+            ),
+            _buildWasteTypeAndDetails(),
+          ],
+        ),
       ),
     );
   }
 
   // waste details
   Widget _buildWasteTypeAndDetails() {
-    if (wasteType == null || weight == null || estPrice == null || pickupDate == null) {
-      return Center(child: CircularProgressIndicator()); // Show loading indicator
+    if (wasteType == null ||
+        weight == null ||
+        estPrice == null ||
+        pickupDate == null) {
+      return Center(
+          child: CircularProgressIndicator()); // Show loading indicator
     }
 
     return SizedBox(
@@ -90,7 +175,8 @@ class _RequestSummaryState extends State<RequestSummary> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RecyclingPage(wasteType: wasteType.toString()),
+                  builder: (context) =>
+                      RecyclingPage(wasteType: wasteType.toString(), actionType1: true,),
                 ),
               );
             },
@@ -112,5 +198,63 @@ class _RequestSummaryState extends State<RequestSummary> {
         separatorBuilder: (context, index) => SizedBox(height: 10),
       ),
     );
+  }
+
+  List<WasteInfoCard> wasteCards = [];
+
+  Future<void> _showWasteTypeDialog() async {
+    List<String> wasteTypes = [
+      'Plastic',
+      'Glass',
+      'Paper',
+      'Metal'
+    ]; // Example list of waste types
+    String? selectedWasteType;
+
+    // Show the dialog
+    selectedWasteType = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Select Waste Type'),
+          content: Container(
+            height: 100,
+            width: double.maxFinite,
+            child: ListView.builder(
+              itemCount: wasteTypes.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Center(child: Text(wasteTypes[index])),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            RecyclingPage(wasteType: wasteTypes[index], actionType1: true, ),
+                      ),
+                    );
+                    // Return the selected waste type
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+
+    // If a waste type was selected, add a new WasteInfoCard to the list
+    if (selectedWasteType != null) {
+      setState(() {
+        wasteCards.add(WasteInfoCard(
+          wasteType: selectedWasteType.toString(),
+          weight: 1,
+          estimatedIncome: 2,
+          editWasteDetails: () {},
+          removeWasteType: () {},
+          pickupDate: DateTime(2025),
+        )); // Add new WasteInfoCard
+      });
+    }
   }
 }

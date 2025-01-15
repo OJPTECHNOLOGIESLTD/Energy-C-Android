@@ -22,7 +22,7 @@ class WasteInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 2.5, ),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 5,

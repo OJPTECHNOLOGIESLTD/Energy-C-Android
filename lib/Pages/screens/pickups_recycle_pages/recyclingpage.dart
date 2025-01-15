@@ -1,20 +1,26 @@
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/pickup_details.dart';
+import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/request_summary.dart';
 import 'package:energy_chleen/utils/Helper.dart';
+import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecyclingPage extends StatefulWidget {
+  final bool actionType1;
   final String wasteType;
 
-  const RecyclingPage({required this.wasteType, super.key});
+  const RecyclingPage({required this.wasteType, super.key, required this.actionType1});
 
   @override
   _RecyclingPageState createState() => _RecyclingPageState();
 }
 
 class _RecyclingPageState extends State<RecyclingPage> {
+  
   int weight = 3;
   int pricePerKg = 1250; // TODO: Get from backend
+
+  final StorageService storageService = StorageService();
 
   // save in shared preference
     Future<void> _saveScheduleData() async {
@@ -27,6 +33,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -117,6 +124,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
                     SizedBox(height: 24),
 
                     // Schedule Button
+                    if(widget.actionType1==false)
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -144,6 +152,36 @@ class _RecyclingPageState extends State<RecyclingPage> {
                                 fontSize: 16, color: Customcolors.white)),
                       ),
                     ),
+                    if(widget.actionType1==true)
+        SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      backgroundColor: Customcolors.teal,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+    onPressed: () async {
+      // Save the schedule data in SharedPreferences
+      await _saveScheduleData();
+
+      // Navigate to RequestSummary and remove all previous routes
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => RequestSummary()),
+        (route) => true, // This removes all previous routes
+      );
+    },
+    child: Text(
+      'Done',
+      style: TextStyle(fontSize: 16, color: Customcolors.white),
+    ),
+  ),
+),
+
+                    
                   ],
                 ),
               ),
