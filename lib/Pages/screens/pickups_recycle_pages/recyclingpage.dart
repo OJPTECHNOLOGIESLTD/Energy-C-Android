@@ -1,4 +1,5 @@
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/pickup_details.dart';
+import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/recycle_tip_video.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
@@ -21,35 +22,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.25,
-                  color: Colors.grey.shade200,
-                  child: Center(child: Text('Image/Video guide')),
-                ),
-                Positioned(
-                  left: 20,
-                  top: 16,
-                  child: Container(
-                    width: 40,
-                    padding: EdgeInsets.only(bottom: 1, left: 5),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Center(
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 18),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            RecycleTipVideo(),
             SizedBox(height: 16),
 
             // Main Content Section
@@ -88,22 +61,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
                     SizedBox(height: 16),
 
                     // Description
-                    Text(
-                      'Learn how to recycle ${widget.wasteType} effectively and contribute to a cleaner, greener environment. Proper disposal ensures it is reused or transformed into sustainable materials, reducing pollution and protecting our ecosystems.',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    SizedBox(height: 16),
-
-                    // Tips for Correct Disposal
-                    Text(
-                      'Tips for Correct Disposal:',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    _buildTips(),
+                    TipsWidget(wasteType: widget.wasteType),
 
                     Spacer(),
 
@@ -180,26 +138,6 @@ class _RecyclingPageState extends State<RecyclingPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildTips() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-            '1. Rinse and Clean: Wash containers to remove residue before recycling.'),
-        SizedBox(height: 4),
-        Text(
-            '2. Check the Type: Look for the recycling symbol and ensure it\'s recyclable.'),
-        SizedBox(height: 4),
-        Text(
-            '3. No Mixed Materials: Avoid placing combined materials in the bin.'),
-        SizedBox(height: 4),
-        Text('4. Flatten for Space: Crush items to save space in the bin.'),
-        SizedBox(height: 4),
-        Text('5. Remove Caps: Separate caps, as they are often made from different materials.'),
-      ],
     );
   }
 

@@ -15,7 +15,7 @@ class StartRecyclingWaste extends StatelessWidget {
           _buildSectionTitle('Recycle'),
           SizedBox(height: 8),
           SizedBox(
-            height: 350, // Adjust the height of the PageView to fit content
+            height: MediaQuery.of(context).size.height * 0.4, // Adjust the height of the PageView to fit content
             child: PageView.builder(
               itemCount: 3, // Define how many pages you want to display
               itemBuilder: (context, index) {
@@ -41,7 +41,19 @@ class StartRecyclingWaste extends StatelessWidget {
           title,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        Icon(Icons.arrow_forward),
+        GestureDetector(
+          onTap: (){
+            print('View All');
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: 
+          BoxDecoration(color: Customcolors.teal,
+          borderRadius: BorderRadius.circular(40)),
+          child: Text('View All',
+          style: TextStyle(color: Customcolors.white, fontWeight: FontWeight.bold),),
+          ),
+        )
       ],
     );
   }
@@ -88,6 +100,7 @@ class PageviewItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 1,
+
       child: Card(
         color: Customcolors.offwhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -95,9 +108,9 @@ class PageviewItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 16),
           child: Column(
             children: [
-              Image.asset('assets/recycle-bin.png', height: 150),
+              Image.asset('assets/Recycle-bin-green.png', width: 250),
               Container(
-                margin: EdgeInsets.only(top: 30),
+                margin: EdgeInsets.only(top: 10),
                 width: MediaQuery.of(context).size.width * 0.5,
                 height: 60,
                 child: ElevatedButton(

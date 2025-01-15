@@ -24,7 +24,54 @@ class Customcolors {
   );
 }
 
-class CustomTexts
- {
-  static TextStyle boldtext=TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
+class TipsWidget extends StatelessWidget {
+  final String wasteType;
+
+  const TipsWidget({Key? key, required this.wasteType}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Description
+        Text(
+          'Learn how to recycle $wasteType effectively and contribute to a cleaner, greener environment. Proper disposal ensures it is reused or transformed into sustainable materials, reducing pollution and protecting our ecosystems.',
+          style: TextStyle(fontSize: 14),
+        ),
+        SizedBox(height: 16),
+
+        // Tips for Correct Disposal
+        Text(
+          'Tips for Correct Disposal:',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        SizedBox(height: 8),
+
+        // Call to the _buildTips method
+        _buildTips(),
+      ],
+    );
+  }
+
+  Widget _buildTips() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        Text('1. Rinse and Clean: Wash containers to remove residue before recycling.'),
+        SizedBox(height: 4),
+        Text('2. Check the Type: Look for the recycling symbol and ensure it\'s recyclable.'),
+        SizedBox(height: 4),
+        Text('3. No Mixed Materials: Avoid placing combined materials in the bin.'),
+        SizedBox(height: 4),
+        Text('4. Flatten for Space: Crush items to save space in the bin.'),
+        SizedBox(height: 4),
+        Text('5. Remove Caps: Separate caps, as they are often made from different materials.'),
+      ],
+    );
+  }
 }
