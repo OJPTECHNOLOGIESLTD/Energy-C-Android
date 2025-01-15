@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// reuseable colors
 class Customcolors {
   Customcolors._();
 
@@ -10,7 +12,7 @@ class Customcolors {
   static const Color green = Colors.green;
   static const Color red = Colors.red;
   static const Color orange = Colors.orange;
-  static const Color offwhite = Color.fromRGBO(231,227,198, 1);
+  static const Color offwhite = Color.fromRGBO(231, 227, 198, 1);
   static const Color paymentBlue = Color.fromRGBO(30, 90, 132, 1);
   static const LinearGradient gradient = LinearGradient(
     begin: Alignment.topLeft,
@@ -24,7 +26,7 @@ class Customcolors {
   );
 }
 
-
+// recycling waste tips
 class TipsWidget extends StatelessWidget {
   final String wasteType;
 
@@ -62,16 +64,220 @@ class TipsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: const [
-        Text('1. Rinse and Clean: Wash containers to remove residue before recycling.'),
+        Text(
+            '1. Rinse and Clean: Wash containers to remove residue before recycling.'),
         SizedBox(height: 4),
-        Text('2. Check the Type: Look for the recycling symbol and ensure it\'s recyclable.'),
+        Text(
+            '2. Check the Type: Look for the recycling symbol and ensure it\'s recyclable.'),
         SizedBox(height: 4),
-        Text('3. No Mixed Materials: Avoid placing combined materials in the bin.'),
+        Text(
+            '3. No Mixed Materials: Avoid placing combined materials in the bin.'),
         SizedBox(height: 4),
         Text('4. Flatten for Space: Crush items to save space in the bin.'),
         SizedBox(height: 4),
-        Text('5. Remove Caps: Separate caps, as they are often made from different materials.'),
+        Text(
+            '5. Remove Caps: Separate caps, as they are often made from different materials.'),
       ],
     );
   }
 }
+
+// recycling tips video
+class RecycleTipVideo extends StatelessWidget {
+  const RecycleTipVideo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Container(
+          height: MediaQuery.of(context).size.height * 0.25,
+          color: Colors.grey.shade200,
+          child: Center(
+              child: Stack(children: [
+            Image.asset('assets/vid.jpg'),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 0,
+              child: IconButton(
+                onPressed: () {
+                  print('Play Video');
+                },
+                icon: Stack(children: [
+                  Icon(
+                    Icons.circle_outlined,
+                    size: 80,
+                    color: Customcolors.white,
+                  ),
+                  Positioned(
+                    left: 5,
+                    right: 0,
+                    bottom: 0,
+                    top: 0,
+                    child: Icon(
+                      CupertinoIcons.play_arrow_solid,
+                      size: 50,
+                      color: Customcolors.white,
+                    ),
+                  ),
+                ]),
+              ),
+            )
+          ])),
+        ),
+        Positioned(
+          left: 20,
+          top: 16,
+          child: Container(
+            width: 40,
+            padding: EdgeInsets.only(bottom: 1, left: 5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+            ),
+            child: Center(
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 18),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// reuseable textform
+class ReuseableTextformfield extends StatefulWidget {
+  final String topTitle;
+  final String hintText;
+  final bool isPasswordField;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
+
+  const ReuseableTextformfield({
+    Key? key,
+    required this.topTitle,
+    required this.hintText,
+    this.isPasswordField = false,
+    this.keyboardType = TextInputType.text,
+    this.validator,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  State<ReuseableTextformfield> createState() => _ReuseableTextformfieldState();
+}
+
+class _ReuseableTextformfieldState extends State<ReuseableTextformfield> {
+  bool _obscurePassword = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.topTitle,
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Customcolors.white),
+          ),
+          SizedBox(height: 8),
+          TextFormField(
+            obscureText: widget.isPasswordField ? _obscurePassword : false,
+            keyboardType: widget.keyboardType,
+            validator: widget.validator,
+            onChanged: widget.onChanged,
+            decoration: InputDecoration(
+              filled: true, // To fill the background color
+              fillColor: Colors.white, // White background color
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide:
+                    BorderSide(color: Colors.white), // White border color
+              ),
+              hintText: widget.hintText,
+              hintStyle: TextStyle(color: Colors.grey),
+              suffixIcon: widget.isPasswordField
+                  ? IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      icon: Icon(
+                        _obscurePassword
+                            ? CupertinoIcons.eye_slash
+                            : CupertinoIcons.eye,
+                        color: Colors.black,
+                      ),
+                    )
+                  : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// recycling schedule progress
+class RecyclingScheduleProgress extends StatelessWidget {
+  final bool isReviewing;
+  final bool isCompleted;
+  
+  const RecyclingScheduleProgress({
+    super.key,
+    required this.isReviewing,
+    required this.isCompleted,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.location_on, color: Customcolors.teal),
+                SizedBox(width: 8),
+                Text(
+                  '- - - - - - - - - - - - - - -',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Customcolors.teal,
+                  ),
+                ),
+                Icon(Icons.edit, color: isReviewing ? Customcolors.teal : Colors.grey),
+                Text(
+                  '- - - - - - - - - - - - - - -',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Customcolors.teal,
+                  ),
+                ),
+              ],
+            ),
+            Icon(Icons.check_circle, color: isCompleted ? Customcolors.teal : Colors.grey),
+          ],
+        ),
+        SizedBox(height: 50),
+      ],
+    );
+  }
+}
+

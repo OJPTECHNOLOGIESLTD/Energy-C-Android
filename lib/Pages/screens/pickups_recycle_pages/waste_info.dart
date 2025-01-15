@@ -1,7 +1,7 @@
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
-class WasteInfo extends StatelessWidget {
+class WasteInfoCard extends StatelessWidget {
   final String wasteType;
   final int weight;
   final int estimatedIncome;
@@ -9,77 +9,94 @@ class WasteInfo extends StatelessWidget {
   final VoidCallback removeWasteType;
   final DateTime pickupDate;
 
-  const WasteInfo(
-    this.wasteType,
-    this.weight,
-    this.estimatedIncome,
-    this.editWasteDetails,
-    this.removeWasteType,
-    this.pickupDate, {
+  const WasteInfoCard({
     super.key,
+    required this.wasteType,
+    required this.weight,
+    required this.estimatedIncome,
+    required this.editWasteDetails,
+    required this.removeWasteType,
+    required this.pickupDate,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 5,
-      color: Customcolors.teal,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      wasteType,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Customcolors.black,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.5, horizontal: 16),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 5,
+        color: Customcolors.teal,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Customcolors.offwhite,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Text(
+                        wasteType,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Customcolors.black,
+                        ),
+                        overflow: TextOverflow.ellipsis, // Handle long text
                       ),
                     ),
-                    SizedBox(
-                      child: Row(
-                        children: [
-                          TextButton(
-                            onPressed: editWasteDetails,
-                            child: Text('Edit'),
-                          ),
-                          TextButton(
-                            onPressed: removeWasteType,
-                            child: Text('Remove'),
-                          ),
-                        ],
+                  ),
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: editWasteDetails,
+                        child: Text('Edit',
+                        style: TextStyle(color: Customcolors.white),),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 4),
-                _buildDetails('Weight', '$weight Kg'),
-                _buildDetails('Estimated Income', '\$$estimatedIncome'),
-                _buildDetails('Pickup Date', '${pickupDate.toLocal()}'.split(' ')[0]),
-              ],
-            ),
-          ],
+                      TextButton(
+                        onPressed: removeWasteType,
+                        child: Text('Remove',
+                        style: TextStyle(color: Customcolors.yellow),),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 4),
+              _buildDetails('Weight', '$weight Kg'),
+              _buildDetails('Estimated Income', '\NGN $estimatedIncome'),
+              _buildDetails('Pickup Date', '${pickupDate.toLocal()}'.split(' ')[0]
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildDetails(String leadingText, String endText) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(leadingText, style: TextStyle(fontWeight: FontWeight.w500)),
-        Text(endText, style: TextStyle(fontWeight: FontWeight.w400)),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            leadingText,
+            style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+          ),
+          Text(
+            endText,
+            style: TextStyle(fontWeight: FontWeight.w400, color: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/pickup_details.dart';
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/recycle_tip_video.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RecyclingPage extends StatefulWidget {
   final String wasteType;
@@ -15,6 +15,15 @@ class RecyclingPage extends StatefulWidget {
 class _RecyclingPageState extends State<RecyclingPage> {
   int weight = 3;
   int pricePerKg = 1250; // TODO: Get from backend
+
+  // save in shared preference
+    Future<void> _saveScheduleData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('wasteType', widget.wasteType);
+    await prefs.setInt('weight', weight);
+    await prefs.setInt('estPrice', weight * pricePerKg);
+    print('waste ${widget.wasteType}, weight ${weight}, est. price ${weight * pricePerKg} ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,8 +127,12 @@ class _RecyclingPageState extends State<RecyclingPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           // Handle scheduling logic here
+
+                          // Save the schedule data in SharedPreferences
+                           await _saveScheduleData();
+                          //  navigate to next screen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
