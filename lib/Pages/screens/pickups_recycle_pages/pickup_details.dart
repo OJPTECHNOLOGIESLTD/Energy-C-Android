@@ -1,5 +1,6 @@
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/home_pickup.dart';
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/station_pickup.dart';
+import 'package:energy_chleen/appbars/appbars.dart';
 import 'package:energy_chleen/buttons/toggle_btn.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
@@ -15,34 +16,7 @@ class _PickUpDetailsPageState extends State<PickUpDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Pick Up Details'),
-        centerTitle: true,
-        leading: Container(
-          margin: EdgeInsets.only(left: 10, right: 10),
-          height: 50,
-          width: 50,
-          padding: EdgeInsets.all(5),
-          decoration:
-              BoxDecoration(shape: BoxShape.circle, color: Customcolors.teal),
-          child: IconButton(
-            tooltip: 'Go back',
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: 18,
-              color: Customcolors.white,
-            ),
-            onPressed: () => Navigator.pop(context), // Navigate back
-          ),
-        ),
-        // backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      appBar: CustomAppBar1(title: 'Pick Up Details'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

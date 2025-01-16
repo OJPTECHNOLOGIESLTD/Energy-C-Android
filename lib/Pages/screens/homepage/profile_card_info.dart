@@ -24,7 +24,8 @@ class ProfileCardInfo extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 30,
-                              backgroundImage: AssetImage('assets/img1.jpg'),
+                              backgroundImage: NetworkImage(
+                        'https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg'), // Placeholder for small avatar
                             ),
                             SizedBox(width: 16),
                             Column(

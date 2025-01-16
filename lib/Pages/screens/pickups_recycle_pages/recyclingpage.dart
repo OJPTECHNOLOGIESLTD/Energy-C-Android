@@ -9,31 +9,31 @@ class RecyclingPage extends StatefulWidget {
   final bool actionType1;
   final String wasteType;
 
-  const RecyclingPage({required this.wasteType, super.key, required this.actionType1});
+  const RecyclingPage(
+      {required this.wasteType, super.key, required this.actionType1});
 
   @override
   _RecyclingPageState createState() => _RecyclingPageState();
 }
 
 class _RecyclingPageState extends State<RecyclingPage> {
-  
   int weight = 3;
   int pricePerKg = 1250; // TODO: Get from backend
 
   final StorageService storageService = StorageService();
 
   // save in shared preference
-    Future<void> _saveScheduleData() async {
+  Future<void> _saveScheduleData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('wasteType', widget.wasteType);
     await prefs.setInt('weight', weight);
     await prefs.setInt('estPrice', weight * pricePerKg);
-    print('waste ${widget.wasteType}, weight ${weight}, est. price ${weight * pricePerKg} ');
+    print(
+        'waste ${widget.wasteType}, weight ${weight}, est. price ${weight * pricePerKg} ');
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -124,64 +124,65 @@ class _RecyclingPageState extends State<RecyclingPage> {
                     SizedBox(height: 24),
 
                     // Schedule Button
-                    if(widget.actionType1==false)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Customcolors.teal,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                    if (widget.actionType1 == false)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Customcolors.teal,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () async {
+                            // Handle scheduling logic here
+
+                            // Save the schedule data in SharedPreferences
+                            await _saveScheduleData();
+                            //  navigate to next screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PickUpDetailsPage()),
+                            );
+                          },
+                          child: Text('Schedule',
+                              style: TextStyle(
+                                  fontSize: 16, color: Customcolors.white)),
+                        ),
+                      ),
+                    if (widget.actionType1 == true)
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Customcolors.teal,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () async {
+                            // Save the schedule data in SharedPreferences
+                            await _saveScheduleData();
+
+                            // Navigate to RequestSummary and remove all previous routes
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RequestSummary()),
+                              (route) =>
+                                  true, // This removes all previous routes
+                            );
+                          },
+                          child: Text(
+                            'Done',
+                            style: TextStyle(
+                                fontSize: 16, color: Customcolors.white),
                           ),
                         ),
-                        onPressed: () async {
-                          // Handle scheduling logic here
-
-                          // Save the schedule data in SharedPreferences
-                           await _saveScheduleData();
-                          //  navigate to next screen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PickUpDetailsPage()),
-                          );
-                        },
-                        child: Text('Schedule',
-                            style: TextStyle(
-                                fontSize: 16, color: Customcolors.white)),
                       ),
-                    ),
-                    if(widget.actionType1==true)
-        SizedBox(
-  width: double.infinity,
-  child: ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      padding: EdgeInsets.symmetric(vertical: 16),
-      backgroundColor: Customcolors.teal,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-    ),
-    onPressed: () async {
-      // Save the schedule data in SharedPreferences
-      await _saveScheduleData();
-
-      // Navigate to RequestSummary and remove all previous routes
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => RequestSummary()),
-        (route) => true, // This removes all previous routes
-      );
-    },
-    child: Text(
-      'Done',
-      style: TextStyle(fontSize: 16, color: Customcolors.white),
-    ),
-  ),
-),
-
-                    
                   ],
                 ),
               ),

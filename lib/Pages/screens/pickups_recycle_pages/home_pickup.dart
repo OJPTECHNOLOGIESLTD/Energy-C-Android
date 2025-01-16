@@ -27,13 +27,17 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
 
   Future<void> _savePickupDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('pickupAddress', _pickupAddressController.text);
-    await prefs.setString('city', _cityController.text);
-    await prefs.setString('state', _stateController.text);
-    if (_selectedDate != null) {
-      await prefs.setString('pickupDate', DateFormat('yyyy-MM-dd').format(_selectedDate!));
+    try {
+      await prefs.setString('pickupAddress', _pickupAddressController.text);
+      await prefs.setString('city', _cityController.text);
+      await prefs.setString('state', _stateController.text);
+      if (_selectedDate != null) {
+        await prefs.setString('pickupDate', DateFormat('yyyy-MM-dd').format(_selectedDate!));
+      }
+      print('Details saved in SharedPreferences');
+    } catch (e) {
+      print('Error saving data: $e');
     }
-    print('Details saved in SharedPreferences');
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -48,6 +52,13 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
         _selectedDate = pickedDate;
       });
     }
+  }
+
+  String? _validateTextField(String value) {
+    if (value.isEmpty) {
+      return 'This field is required';
+    }
+    return null;
   }
 
   @override
@@ -88,6 +99,17 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () async {
+                if (_pickupAddressController.text.isEmpty ||
+                    _cityController.text.isEmpty ||
+                    _stateController.text.isEmpty ||
+                    _selectedDate == null) {
+                  // Show a message to the user
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please fill all fields and select a date')),
+                  );
+                  return;
+                }
+
                 await _savePickupDetails();
                 Navigator.push(
                   context,
@@ -128,6 +150,7 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
           maxLines: maxLines,
           decoration: InputDecoration(
             border: OutlineInputBorder(),
+            errorText: _validateTextField(controller.text),
           ),
         ),
         SizedBox(height: 20),

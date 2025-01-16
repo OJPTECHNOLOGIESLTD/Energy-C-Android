@@ -1,6 +1,7 @@
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/home_pickup.dart';
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/recyclingpage.dart';
 import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/waste_info.dart';
+import 'package:energy_chleen/appbars/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,11 @@ class _RequestSummaryState extends State<RequestSummary> {
   int? weight;
   int? estPrice;
   DateTime? pickupDate;
-  TextEditingController _pickupAddressController = TextEditingController();
-  TextEditingController _cityController = TextEditingController();
-  TextEditingController _stateController = TextEditingController();
+  final TextEditingController _pickupAddressController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  List<WasteInfoCard> wasteCards = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -29,55 +32,143 @@ class _RequestSummaryState extends State<RequestSummary> {
   }
 
   Future<void> _loadScheduleData() async {
-    StorageService storageService = StorageService();
-    // Load pickup details
-    Map<String, dynamic> pickupDetails =
-        await storageService.loadPickupDetails();
-    setState(() {
-      _pickupAddressController.text = pickupDetails['pickupAddress'] ?? '';
-      _cityController.text = pickupDetails['city'] ?? '';
-      _stateController.text = pickupDetails['state'] ?? '';
-      pickupDate = pickupDetails['pickupDate'];
-    });
+    try {
+      StorageService storageService = StorageService();
 
-    // Load waste details
-    Map<String, dynamic> wasteDetails = await storageService.loadWasteDetails();
+      // Load pickup details
+      Map<String, dynamic> pickupDetails = await storageService.loadPickupDetails();
+      Map<String, dynamic> wasteDetails = await storageService.loadWasteDetails();
+
+      setState(() {
+        _pickupAddressController.text = pickupDetails['pickupAddress'] ?? '';
+        _cityController.text = pickupDetails['city'] ?? '';
+        _stateController.text = pickupDetails['state'] ?? '';
+        pickupDate = pickupDetails['pickupDate'];
+
+        wasteType = wasteDetails['wasteType'];
+        weight = wasteDetails['weight'];
+        estPrice = wasteDetails['estPrice'];
+
+        if (wasteType != null && weight != null && estPrice != null) {
+          _addWasteCard(wasteType!, weight!, estPrice!);
+        }
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading data: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void _addWasteCard(String wasteType, int weight, int estimatedIncome) {
     setState(() {
-      wasteType = wasteDetails['wasteType'];
-      weight = wasteDetails['weight'];
-      estPrice = wasteDetails['estPrice'];
+      wasteCards.add(WasteInfoCard(
+        wasteType: wasteType,
+        weight: weight,
+        estimatedIncome: estimatedIncome,
+        editWasteDetails: () {}, // Placeholder for edit functionality
+        removeWasteType: () => _removeWasteType(wasteType),
+        pickupDate: pickupDate ?? DateTime.now(),
+      ));
+    });
+  }
+
+  Future<void> _removeWasteType(String wasteTypeToRemove) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('wasteType');
+    await prefs.remove('weight');
+    await prefs.remove('estPrice');
+
+    setState(() {
+      wasteCards.removeWhere((card) => card.wasteType == wasteTypeToRemove);
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Request Summary'),
-        centerTitle: true,
-        leading: Container(
-          margin: EdgeInsets.only(left: 10, right: 10),
-          height: 50,
-          width: 50,
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Customcolors.teal,
-          ),
-          child: IconButton(
-            tooltip: 'Go back',
-            icon:
-                Icon(Icons.arrow_back_ios, size: 18, color: Customcolors.white),
-            onPressed: () => Navigator.pop(context), // Navigate back
+  void dispose() {
+    _pickupAddressController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildWasteTypeAndDetails() {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (wasteCards.isEmpty) {
+      return Center(
+        child: Text(
+          'No Waste To Recycle',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.5,
+      child: ListView.separated(
+        itemCount: wasteCards.length,
+        itemBuilder: (context, index) => wasteCards[index],
+        separatorBuilder: (context, index) => SizedBox(height: 10),
+      ),
+    );
+  }
+
+  Future<void> _showWasteTypeDialog() async {
+  List<String> wasteTypes = ['Plastic', 'Glass', 'Paper', 'Metal'];
+  String? selectedWasteType;
+
+  // Show the dialog
+  selectedWasteType = await showDialog<String>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Select Waste Type'),
+        content: SizedBox(
+          height: 100,
+          child: ListView.builder(
+            itemCount: wasteTypes.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Center(child: Text(wasteTypes[index])),
+                onTap: () {
+                  Navigator.pop(context, wasteTypes[index]); // Return selected waste type
+                },
+              );
+            },
           ),
         ),
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
+      );
+    },
+  );
+
+  if (selectedWasteType != null) {
+    // Add waste card and navigate to RecyclingPage
+    setState(() {
+      _addWasteCard(selectedWasteType!, 1, 2); // Example data
+    });
+
+    // Navigate after updating the state
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecyclingPage(
+          wasteType: selectedWasteType!,
+          actionType1: true,
         ),
       ),
+    );
+  }
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar1(title: 'Request Summary'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -99,25 +190,23 @@ class _RequestSummaryState extends State<RequestSummary> {
                             fontSize: 16),
                       ),
                       TextButton(
-                          onPressed: () {
-  debugPrint('Navigating to HomePickupDetails...');
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => HomePickupDetails(),
-    ),
-  );
-},
-
-                          child: Text(
-                            'Change',
-                            style: TextStyle(color: Colors.grey),
-                          )),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePickupDetails(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Change',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
                     ],
                   ),
-                  // this text is for displaying the pickup address
-                  Text('${_pickupAddressController.text} ${_cityController.text} ${_stateController.text}')
-
+                  Text(
+                      '${_pickupAddressController.text} ${_cityController.text} ${_stateController.text}')
                 ],
               ),
             ),
@@ -131,17 +220,22 @@ class _RequestSummaryState extends State<RequestSummary> {
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                 ),
-                TextButton(
-                  onPressed: () {
-                    _showWasteTypeDialog();
-                  },
-                  child: Text(
-                    'Add +',
-                    style: TextStyle(
-                        color: Customcolors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ), //add a fresh/new wasteType to list that will be recycled
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10,),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40),
+                    color: Colors.teal.withOpacity(0.1),
+                  ),
+                  child: TextButton(
+                    onPressed: _showWasteTypeDialog,
+                    child: Text(
+                      'Add +',
+                      style: TextStyle(
+                          color: Customcolors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -150,111 +244,5 @@ class _RequestSummaryState extends State<RequestSummary> {
         ),
       ),
     );
-  }
-
-  // waste details
-  Widget _buildWasteTypeAndDetails() {
-    if (wasteType == null ||
-        weight == null ||
-        estPrice == null ||
-        pickupDate == null) {
-      return Center(
-          child: CircularProgressIndicator()); // Show loading indicator
-    }
-
-    return SizedBox(
-      height: 300, // Define a fixed height for the list
-      child: ListView.separated(
-        itemCount: 1, // You are displaying only one item, so set count to 1
-        itemBuilder: (context, index) {
-          return WasteInfoCard(
-            wasteType: wasteType!,
-            weight: weight!,
-            estimatedIncome: estPrice!,
-            editWasteDetails: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      RecyclingPage(wasteType: wasteType.toString(), actionType1: true,),
-                ),
-              );
-            },
-            removeWasteType: () async {
-              // Remove the waste type from SharedPreferences
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.remove('wasteType');
-              await prefs.remove('weight');
-              await prefs.remove('estPrice');
-              setState(() {
-                wasteType = null;
-                weight = null;
-                estPrice = null;
-              });
-            },
-            pickupDate: pickupDate!,
-          );
-        },
-        separatorBuilder: (context, index) => SizedBox(height: 10),
-      ),
-    );
-  }
-
-  List<WasteInfoCard> wasteCards = [];
-
-  Future<void> _showWasteTypeDialog() async {
-    List<String> wasteTypes = [
-      'Plastic',
-      'Glass',
-      'Paper',
-      'Metal'
-    ]; // Example list of waste types
-    String? selectedWasteType;
-
-    // Show the dialog
-    selectedWasteType = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Select Waste Type'),
-          content: Container(
-            height: 100,
-            width: double.maxFinite,
-            child: ListView.builder(
-              itemCount: wasteTypes.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Center(child: Text(wasteTypes[index])),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            RecyclingPage(wasteType: wasteTypes[index], actionType1: true, ),
-                      ),
-                    );
-                    // Return the selected waste type
-                  },
-                );
-              },
-            ),
-          ),
-        );
-      },
-    );
-
-    // If a waste type was selected, add a new WasteInfoCard to the list
-    if (selectedWasteType != null) {
-      setState(() {
-        wasteCards.add(WasteInfoCard(
-          wasteType: selectedWasteType.toString(),
-          weight: 1,
-          estimatedIncome: 2,
-          editWasteDetails: () {},
-          removeWasteType: () {},
-          pickupDate: DateTime(2025),
-        )); // Add new WasteInfoCard
-      });
-    }
   }
 }
