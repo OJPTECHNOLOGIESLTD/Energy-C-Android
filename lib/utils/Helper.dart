@@ -160,6 +160,7 @@ class ReuseableTextformfield extends StatefulWidget {
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  final TextEditingController controller;
 
   const ReuseableTextformfield({
     Key? key,
@@ -168,7 +169,7 @@ class ReuseableTextformfield extends StatefulWidget {
     this.isPasswordField = false,
     this.keyboardType = TextInputType.text,
     this.validator,
-    this.onChanged,
+    this.onChanged, required this.controller,
   }) : super(key: key);
 
   @override
