@@ -1,4 +1,5 @@
 import 'package:energy_chleen/appbars/appbars.dart';
+import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
 class WasteTypesPage extends StatelessWidget {
@@ -52,12 +53,17 @@ class WasteTypesPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-                    onPressed: () {},
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Customcolors.teal
+                    ),
                     child: Text('METAL WASTE',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold,
+                        color: Customcolors.white)),
                   ),
                   SizedBox(height: 40 ),
                   // Optimized ListView.builder

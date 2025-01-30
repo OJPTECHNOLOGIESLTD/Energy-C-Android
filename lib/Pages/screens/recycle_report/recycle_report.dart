@@ -15,96 +15,126 @@ class _RecycleReportScreenState extends State<RecycleReportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar1(title: 'Recycle Report'),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 50,
-            ),
-            Card(
-              elevation: 5,
-              color: Customcolors.teal,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+      body: DecoratedBox(position: DecorationPosition.background,
+         decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+              image: BackImageScafford.bgImg)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 50,
+              ),
+              Card(
+                elevation: 5,
+                color: Customcolors.teal,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Weight Recycled',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            '18kg',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            'Weekly | Monthly',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          Switch(
+                            value: isMonthly,
+                            onChanged: (value) {
+                              setState(() {
+                                isMonthly = value;
+                              });
+                            },
+                            inactiveTrackColor: Colors.teal.shade200,
+                            inactiveThumbColor: Colors.white,
+                            activeColor: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 50),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Est. Income',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  SizedBox(
+                    child: Row(
                       children: [
-                        Text(
-                          'Total Weight Recycled',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '18kg',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        TextButton(onPressed: (){
+                          setState(() {
+                            isMonthly=true;
+                          });
+                        }, child: Text('Monthly', style: TextStyle(color: isMonthly?Customcolors.teal : Colors.grey),)),
+                        Text('|'),
+                        TextButton(onPressed: (){
+                          setState(() {
+                            isMonthly=false;
+                          });
+                        }, child: Text('Weekly', style: TextStyle(color: isMonthly? Colors.grey:Customcolors.teal),)),
                       ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Weekly | Monthly',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Switch(
-                          value: isMonthly,
-                          onChanged: (value) {
-                            setState(() {
-                              isMonthly = value;
-                            });
-                          },
-                          inactiveTrackColor: Colors.teal.shade200,
-                          inactiveThumbColor: Colors.white,
-                          activeColor: Colors.white,
-                        ),
-                      ],
-                    ),
+                    )),
+                ],
+              ),
+              SizedBox(height: 50),
+              Expanded(
+                child: SfCartesianChart(
+                  primaryXAxis: CategoryAxis(),
+                  primaryYAxis: NumericAxis(
+                    isVisible: false, // Removes gridline numbers
+                  ),
+                  series: <CartesianSeries>[
+                    ColumnSeries<ChartData, String>(
+                      dataSource:
+                          isMonthly ? _createMonthlyData() : _createWeeklyData(),
+                      xValueMapper: (ChartData data, _) => data.label,
+                      yValueMapper: (ChartData data, _) => data.value,
+                      pointColorMapper: (ChartData data, _) =>
+                          _getBarColor(data), // Custom color for bars
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(5),
+                        bottom: Radius.circular(5),
+                      ),
+                    )
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: 50),
-            Text(
-              'Total Est. Income',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            SizedBox(height: 50),
-            Expanded(
-              child: SfCartesianChart(
-                primaryXAxis: CategoryAxis(),
-                primaryYAxis: NumericAxis(
-                  isVisible: false, // Removes gridline numbers
-                ),
-                series: <CartesianSeries>[
-                  ColumnSeries<ChartData, String>(
-                    dataSource:
-                        isMonthly ? _createMonthlyData() : _createWeeklyData(),
-                    xValueMapper: (ChartData data, _) => data.label,
-                    yValueMapper: (ChartData data, _) => data.value,
-                    pointColorMapper: (ChartData data, _) =>
-                        _getBarColor(data), // Custom color for bars
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(10),
-                      bottom: Radius.circular(10),
-                    ),
-                  )
-                ],
+              Divider(
+                color: Colors.black,
               ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.2,
-            )
-          ],
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.2,
+              )
+            ],
+          ),
         ),
       ),
     );

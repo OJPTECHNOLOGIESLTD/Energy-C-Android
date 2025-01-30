@@ -9,11 +9,14 @@ class NewsAndEvent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar1(title: 'News and Updates',),
-      body: ListView.builder(
-        itemCount: 4,
-        itemBuilder: (BuildContext context, int index){
-        return NewsAndEventCard(titleBool: false);
-      }),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: ListView.builder(
+          itemCount: 4,
+          itemBuilder: (BuildContext context, int index){
+          return NewsAndEventCard(titleBool: false);
+        }),
+      ),
     );
   }
 }

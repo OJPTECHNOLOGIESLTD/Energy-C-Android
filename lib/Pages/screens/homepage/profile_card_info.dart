@@ -1,9 +1,16 @@
+import 'package:energy_chleen/Pages/screens/recycle_report/my_points.dart';
+import 'package:energy_chleen/Pages/screens/recycle_report/recycle_report.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
-class ProfileCardInfo extends StatelessWidget {
+class ProfileCardInfo extends StatefulWidget {
   const ProfileCardInfo({super.key});
 
+  @override
+  State<ProfileCardInfo> createState() => _ProfileCardInfoState();
+}
+
+class _ProfileCardInfoState extends State<ProfileCardInfo> {
   @override
   Widget build(BuildContext context) {
     return   // User info card
@@ -55,8 +62,11 @@ class ProfileCardInfo extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildInfoCard('Waste Recycled', '18 kg', Icons.recycling, Customcolors.offwhite),
-                            _buildInfoCard('Points Earned', '10', Icons.favorite, Customcolors.white),
+                            _buildInfoCard('Waste Recycled', '18 kg', Icons.recycling, Customcolors.offwhite,
+                            onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>RecycleReportScreen()));}),
+                            _buildInfoCard('Points Earned', '10', Icons.favorite, Customcolors.white,
+                            onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>MyPointsPage()));}
+                            ),
                           ],
                         ),
                       ),
@@ -66,30 +76,34 @@ class ProfileCardInfo extends StatelessWidget {
               ),
             );
   }
-    Widget _buildInfoCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10),
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: color,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(color: Customcolors.black, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 4),
-          Icon(icon, color: Customcolors.teal, size: 24),
-          SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-                color: Customcolors.black, fontWeight: FontWeight.bold, fontSize: 24),
-          ),
-        ],
+
+    Widget _buildInfoCard(String title, String value, IconData icon, Color color, {required VoidCallback onTap,} ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: color,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(color: Customcolors.black, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 4),
+            Icon(icon, color: Customcolors.teal, size: 24),
+            SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                  color: Customcolors.black, fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+          ],
+        ),
       ),
     );
   }

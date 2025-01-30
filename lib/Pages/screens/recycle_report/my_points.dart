@@ -155,27 +155,25 @@ class MyPointsPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Eco-friendly plastic Trash can',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            SizedBox(height: 8),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width* 0.25,
+                          child: Text(
+                                overflow: TextOverflow.visible,
+                                'Eco-friendly plastic Trash can',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Customcolors.white),
+                              ),
+                        ),
                             Text(
                               '50 ~ ₦1,000',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Customcolors.white),
                             ),
-                          ],
-                        ),
-                        Text(
+                             Text(
                           '₦4,000',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 12, fontWeight: FontWeight.bold, color: Customcolors.white
                           ),
                         ),
+                          Icon(Icons.more_vert, color: Customcolors.white,)
                       ],
                     ),
                   ),

@@ -1,3 +1,4 @@
+import 'package:energy_chleen/Pages/screens/notification.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
@@ -27,13 +28,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 15.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.teal, // Customcolors.teal can be replaced with this for simplicity
-            child: IconButton(
-              icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-              onPressed: () {
-                // Add notification logic here
-              },
+          child: Container(
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Customcolors.teal, // Customcolors.teal can be replaced with this for simplicity
+                  child: IconButton(
+                    icon: const Icon(Icons.headphones_outlined, color: Colors.white),
+                    onPressed: () {
+                      // Add notification logic here
+                    },
+                  ),
+                ),
+                SizedBox(width: 10,),
+                CircleAvatar(
+                  backgroundColor: Customcolors.teal, // Customcolors.teal can be replaced with this for simplicity
+                  child: IconButton(
+                    icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                    onPressed: () {
+                      // Add notification logic here
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>Notifications()));
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ),

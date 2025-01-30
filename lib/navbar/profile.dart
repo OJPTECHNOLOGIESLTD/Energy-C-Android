@@ -1,6 +1,5 @@
 import 'package:energy_chleen/Pages/screens/homepage/news_and_event.dart';
 import 'package:energy_chleen/Pages/screens/recycle_report/my_points.dart';
-import 'package:energy_chleen/Pages/screens/recycle_report/recycle_report.dart';
 import 'package:energy_chleen/Pages/screens/waste_type.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';

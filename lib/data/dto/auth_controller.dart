@@ -12,7 +12,7 @@ class AuthController extends GetxController {
   var firstName = "".obs;
   var lastName = "".obs;
 
-  final String baseUrl = "https://your-backend-url.com/api"; // Replace with energy chleen actual backend URL
+  final String baseUrl = "https://energychleen.net/backend"; // Replace with energy chleen actual backend URL
 
   @override
   void onInit() {
