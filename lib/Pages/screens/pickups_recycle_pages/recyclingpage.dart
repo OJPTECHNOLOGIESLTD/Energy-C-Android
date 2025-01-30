@@ -22,7 +22,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
 
   final StorageService storageService = StorageService();
 
-  // save in shared preference
+  // Save in shared preference
   Future<void> _saveScheduleData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('wasteType', widget.wasteType);
@@ -40,150 +40,145 @@ class _RecyclingPageState extends State<RecyclingPage> {
           children: [
             RecycleTipVideo(),
             SizedBox(height: 16),
-
-            // Main Content Section
+            
+            // Wrapping this part in SingleChildScrollView
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title and Price Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          widget.wasteType,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        Text(
-                          'NGN $pricePerKg/kg',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
+              child: SingleChildScrollView(
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
-                    SizedBox(height: 16),
-
-                    // Description
-                    TipsWidget(wasteType: widget.wasteType),
-
-                    Spacer(),
-
-                    // Weight and Price section
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Weight Selector
-                        Column(
-                          children: [
-                            Text(
-                              'Weight/kg',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title and Price Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.wasteType,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
-                            SizedBox(height: 8),
-                            _buildWeightSelector(),
-                          ],
-                        ),
-
-                        // Price Display
-                        Column(
-                          children: [
-                            Text(
-                              'Est. Price',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'NGN $pricePerKg/kg',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
                             ),
-                            SizedBox(height: 8),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'NGN ${weight * pricePerKg}',
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16),
+                      
+                      // Description
+                      TipsWidget(wasteType: widget.wasteType),
+                      
+                      SizedBox(height: 24),
+                      
+                      // Weight and Price section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Weight Selector
+                          Column(
+                            children: [
+                              Text(
+                                'Weight/kg',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24),
-
-                    // Schedule Button
-                    if (widget.actionType1 == false)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: Customcolors.teal,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                              SizedBox(height: 8),
+                              _buildWeightSelector(),
+                            ],
                           ),
-                          onPressed: () async {
-                            // Handle scheduling logic here
-
-                            // Save the schedule data in SharedPreferences
-                            await _saveScheduleData();
-                            //  navigate to next screen
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PickUpDetailsPage()),
-                            );
-                          },
-                          child: Text('Schedule',
+                          
+                          // Price Display
+                          Column(
+                            children: [
+                              Text(
+                                'Est. Price',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 8),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  'NGN ${weight * pricePerKg}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 24),
+                      
+                      // Schedule Button
+                      if (!widget.actionType1)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Customcolors.teal,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await _saveScheduleData();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PickUpDetailsPage()),
+                              );
+                            },
+                            child: Text('Schedule',
+                                style: TextStyle(
+                                    fontSize: 16, color: Customcolors.white)),
+                          ),
+                        ),
+                      if (widget.actionType1)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Customcolors.teal,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () async {
+                              await _saveScheduleData();
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RequestSummary()),
+                                (route) => true, // This removes all previous routes
+                              );
+                            },
+                            child: Text(
+                              'Done',
                               style: TextStyle(
-                                  fontSize: 16, color: Customcolors.white)),
-                        ),
-                      ),
-                    if (widget.actionType1 == true)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            backgroundColor: Customcolors.teal,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                                  fontSize: 16, color: Customcolors.white),
                             ),
                           ),
-                          onPressed: () async {
-                            // Save the schedule data in SharedPreferences
-                            await _saveScheduleData();
-
-                            // Navigate to RequestSummary and remove all previous routes
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RequestSummary()),
-                              (route) =>
-                                  true, // This removes all previous routes
-                            );
-                          },
-                          child: Text(
-                            'Done',
-                            style: TextStyle(
-                                fontSize: 16, color: Customcolors.white),
-                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -192,6 +187,8 @@ class _RecyclingPageState extends State<RecyclingPage> {
       ),
     );
   }
+
+
 
   Widget _buildWeightSelector() {
     return Row(

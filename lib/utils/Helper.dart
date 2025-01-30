@@ -25,6 +25,14 @@ class Customcolors {
     ],
   );
 }
+class BackImageScafford{
+  static AssetImage bgImg = AssetImage(
+          'assets/doodle.png',
+        );
+  static AssetImage authbBgImg = AssetImage(
+          'assets/img1.jpg',
+        );
+}
 
 // recycling waste tips
 class TipsWidget extends StatelessWidget {

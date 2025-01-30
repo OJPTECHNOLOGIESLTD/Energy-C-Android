@@ -1,5 +1,5 @@
 import 'package:energy_chleen/Auth/signup.dart';
-import 'package:energy_chleen/data/dto/auth.dart';
+import 'package:energy_chleen/data/dto/auth_controller.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,34 +13,8 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-    // Login logic with API Service
-  Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      // Calling the ApiService's Login method
-      var response = await ApiService().login(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      if (response.statusCode == 200) {
-        // Success logic
-        print("Login successful: ${response.body}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Successful')),
-        );
-      } else {
-        // Error handling
-        print("Error: ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Failed')),
-        );
-      }
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,9 +36,7 @@ class _LoginState extends State<Login> {
       body: DecoratedBox(
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage(
-          'assets/img1.jpg',
-        ))),
+                image: BackImageScafford.authbBgImg)),
         child: Stack(
           children: [
             Positioned.fill(
@@ -147,6 +119,7 @@ class _LoginState extends State<Login> {
                         onPressed: () {
                           // Navigate to your main app screen here
                           print("Sign up now!");
+                          AuthController.instance.login(_emailController.text, _passwordController.text);
                         },
                         child: Text(
                           "LOG IN",

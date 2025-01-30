@@ -1,4 +1,6 @@
-import 'package:energy_chleen/Pages/screens/recycle_report.dart';
+import 'package:energy_chleen/Pages/screens/homepage/news_and_event.dart';
+import 'package:energy_chleen/Pages/screens/recycle_report/my_points.dart';
+import 'package:energy_chleen/Pages/screens/recycle_report/recycle_report.dart';
 import 'package:energy_chleen/Pages/screens/waste_type.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
@@ -20,108 +22,114 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 50,),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 70,
-                    child: Icon(
-                      size: 70,
-                        Icons.person), // Replace with user's image URL
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    child: CircleAvatar(
+        body: DecoratedBox(position: DecorationPosition.background,
+         decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+              image: BackImageScafford.bgImg)),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 50,),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircleAvatar(
                       radius: 70,
-                      backgroundImage: NetworkImage(
-                          'https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg'), // Placeholder for small avatar
+                      child: Icon(
+                        size: 70,
+                          Icons.person), // Replace with user's image URL
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      child: CircleAvatar(
+                        radius: 70,
+                        backgroundImage: NetworkImage(
+                            'https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg'), // Placeholder for small avatar
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Benjamin Ezoh',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const Text(
+                  'Level 1: Beginner',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Customcolors.teal,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Benjamin Ezoh',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                'Level 1: Beginner',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Customcolors.teal,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
+                  child: const Text('Edit Profile',
+                  style: TextStyle(color: Customcolors.white),),
+                ),
+                const SizedBox(height: 20),
+                _buildListTile(
+                  context,
+                  icon: Icons.assignment,
+                  title: 'Waste Types & Rates',
+                  onTap: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context)=>WasteTypesPage()));
+                  },
+                ),
+                _buildListTile(
+                  context,
+                  icon: Icons.event,
+                  title: 'News & Events',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>NewsAndEvent()));
+                  },
+                ),
+                _buildListTile(
+                  context,
+                  icon: Icons.star_rate,
+                  title: 'Rate App',
+                  onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>MyPointsPage()));},
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 25.0),
+                  child: _buildListTile(
+                    context,
+                    icon: Icons.info,
+                    title: 'About Us',
+                    onTap: () {},
                   ),
                 ),
-                child: const Text('Edit Profile',
-                style: TextStyle(color: Customcolors.white),),
-              ),
-              const SizedBox(height: 20),
-              _buildListTile(
-                context,
-                icon: Icons.assignment,
-                title: 'Waste Types & Rates',
-                onTap: () {
-                   Navigator.push(context, MaterialPageRoute(builder: (context)=>WasteTypesPage()));
-                },
-              ),
-              _buildListTile(
-                context,
-                icon: Icons.event,
-                title: 'News & Events',
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RecycleReportScreen()));
-                },
-              ),
-              _buildListTile(
-                context,
-                icon: Icons.star_rate,
-                title: 'Rate App',
-                onTap: () {},
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 25.0),
-                child: _buildListTile(
+                _buildListTile(
                   context,
-                  icon: Icons.info,
-                  title: 'About Us',
+                  icon: Icons.rule,
+                  title: 'Terms & Conditions',
                   onTap: () {},
                 ),
-              ),
-              _buildListTile(
-                context,
-                icon: Icons.rule,
-                title: 'Terms & Conditions',
-                onTap: () {},
-              ),
-              _buildListTile(
-                context,
-                icon: Icons.delete,
-                title: 'Delete Account',
-                onTap: () {},
-              ),
-              _buildListTile(
-                context,
-                icon: Icons.logout,
-                title: 'Log out',
-                onTap: () {},
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Version 2.0',
-                style: TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 10),
-            ],
+                _buildListTile(
+                  context,
+                  icon: Icons.delete,
+                  title: 'Delete Account',
+                  onTap: () {},
+                ),
+                _buildListTile(
+                  context,
+                  icon: Icons.logout,
+                  title: 'Log out',
+                  onTap: () {},
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Version 2.0',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),

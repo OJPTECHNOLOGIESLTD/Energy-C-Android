@@ -57,34 +57,36 @@ class CustomAppBar1 extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(title),
-      centerTitle: true,
-      leading: Container(
-        margin: const EdgeInsets.only(left: 10, right: 10),
-        height: 50,
-        width: 50,
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Customcolors.teal, // Replace Customcolors.teal with Colors.teal for simplicity
-        ),
-        child: IconButton(
-          tooltip: 'Go back',
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            size: 18,
-            color: Colors.white, // Replace Customcolors.white with Colors.white
+    return
+      AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text(title),
+        centerTitle: true,
+        leading: Container(
+          margin: const EdgeInsets.only(left: 10, right: 10),
+          height: 50,
+          width: 50,
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Customcolors.teal, // Replace Customcolors.teal with Colors.teal for simplicity
           ),
-          onPressed: () => Navigator.pop(context),
+          child: IconButton(
+            tooltip: 'Go back',
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              size: 18,
+              color: Colors.white, // Replace Customcolors.white with Colors.white
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-      ),
-      elevation: 0,
-      iconTheme: const IconThemeData(color: Colors.black),
-      titleTextStyle: const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-      ),
-    );
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        titleTextStyle: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      );
   }
 }

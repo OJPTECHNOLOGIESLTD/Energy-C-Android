@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:energy_chleen/Pages/onboarding_screen/onboarding.dart';
+import 'package:energy_chleen/data/dto/auth_controller.dart';
+import 'package:energy_chleen/navbar/navbar.dart';
 import 'package:flutter/material.dart';
 
 // void main() => runApp(SplashApp());
@@ -31,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Navigate to OnboardingScreen after 3 seconds
     Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
+      AuthController.instance.isLoggedIn.value ? CustomBottomNav() : Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => OnboardingScreen()),
       );

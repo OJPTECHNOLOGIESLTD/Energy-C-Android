@@ -1,5 +1,4 @@
-import 'package:energy_chleen/data/dto/auth.dart';
-import 'package:energy_chleen/navbar/navbar.dart';
+import 'package:energy_chleen/data/dto/auth_controller.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
@@ -21,36 +20,7 @@ class _SignupState extends State<Signup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  // Registration logic with API Service
-  Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
-      // Calling the ApiService's register method
-      var response = await ApiService().register(
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        email: _emailController.text,
-        phoneNumber: _phoneController.text,
-        password: _passwordController.text,
-      );
-
-      if (response.statusCode == 200) {
-        // Success logic
-        print("Registration successful: ${response.body}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration Successful')),
-        );
-      } else {
-        // Error handling
-        print("Error: ${response.statusCode}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration Failed')),
-        );
-      }
-    }
-  }
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -70,31 +40,29 @@ class _SignupState extends State<Signup> {
         ),
         toolbarHeight: 40,
       ),
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage(
-          'assets/img1.jpg',
-        ))),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Customcolors.teal.withOpacity(0.95),
+      body: Form(
+        key: _formKey,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage(
+            'assets/img1.jpg',
+          ))),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  decoration: BoxDecoration(
+                    color: Customcolors.teal.withOpacity(0.95),
+                  ),
                 ),
               ),
-            ),
-
-            // Centered text content over the image and gradient
-            Positioned(
-              top: 20,
-              left: 0,
-              right: 0,
-              child: Container(
-                margin: EdgeInsets.only(left: 20, right: 20),
-                // width: MediaQuery.of(context).size.width * 0.7,
-                child: SingleChildScrollView(
+              // Centered text content over the image and gradient
+              SingleChildScrollView(
+                child: Container(
+                  margin: EdgeInsets.only(left: 20, right: 20),
+                  // width: MediaQuery.of(context).size.width * 0.7,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -117,7 +85,7 @@ class _SignupState extends State<Signup> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 20),
-
+                      
                       // textfield
                       ReuseableTextformfield(
                         controller: _firstNameController,
@@ -138,7 +106,7 @@ class _SignupState extends State<Signup> {
                         topTitle: 'Last Name',
                         hintText: 'Your last name',
                         validator: (value) {
-                          if (value!.isEmpty) {
+                          if (value==null || value.isEmpty) {
                             return 'Last name is required';
                           }
                           return null;
@@ -153,7 +121,7 @@ class _SignupState extends State<Signup> {
                         hintText: 'example@gmail.com',
                         keyboardType: TextInputType.emailAddress,
                         validator: (value) {
-                          if (value!.isEmpty || !value.contains('@')) {
+                          if (value==null || value.isEmpty || !value.contains('@')) {
                             return 'Please enter a valid email';
                           }
                           return null;
@@ -168,7 +136,7 @@ class _SignupState extends State<Signup> {
                         hintText: '080*******95',
                         keyboardType: TextInputType.phone,
                         validator: (value) {
-                          if (value!.isEmpty) {
+                          if (value==null || value.isEmpty) {
                             return 'Phone number is required';
                           }
                           return null;
@@ -183,7 +151,7 @@ class _SignupState extends State<Signup> {
                         hintText: 'Password',
                         isPasswordField: true,
                         validator: (value) {
-                          if (value!.isEmpty) {
+                          if (value==null || value.isEmpty) {
                             return 'Password is required';
                           }
                           return null;
@@ -198,7 +166,7 @@ class _SignupState extends State<Signup> {
                         hintText: 'Confirm Password',
                         isPasswordField: true,
                         validator: (value) {
-                          if (value!.isEmpty) {
+                          if (value==null || value.isEmpty) {
                             return 'Confirm Password is required';
                           }
                           return null;
@@ -269,31 +237,42 @@ class _SignupState extends State<Signup> {
                           ),
                         ),
                         onPressed: () {
-                          // Navigate to homepage here
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CustomBottomNav()),
-                          );
+                          if (isChecked==true) {
+                            // Navigate to homepage here
+                            AuthController.instance.register(
+                              _firstNameController.text,
+                              _lastNameController.text,
+                              _passwordController.text,
+                              _emailController.text,
+                              _phoneController.text);                         
+                          }else{
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Customcolors.orange,
+                                content: Text(
+                                  textAlign: TextAlign.center,
+                                  'you have agreed to our privacy and policy')),
+                            );
+                          }
                           print("Sign up now!");
                         },
                         child: Text(
                           "SIGN UP",
                           style: TextStyle(
                             fontSize:
-                                18, // Adjusts the text size inside the button
+                                18, // Adjusts the text size inside the button 
                             fontWeight: FontWeight.bold,
                             color: Customcolors.black,
                           ),
                         ),
                       ),
-                      //  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                       SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                     ],
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -15,7 +15,7 @@ class StartRecyclingWaste extends StatelessWidget {
           _buildSectionTitle('Recycle'),
           SizedBox(height: 8),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.4, // Adjust the height of the PageView to fit content
+            height: MediaQuery.of(context).size.height * 0.35, // Adjust the height of the PageView to fit content
             child: PageView.builder(
               itemCount: 3, // Define how many pages you want to display
               itemBuilder: (context, index) {
@@ -104,40 +104,38 @@ class PageviewItem extends StatelessWidget {
       child: Card(
         color: Customcolors.offwhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 16),
-          child: Column(
-            children: [
-              Image.asset('assets/Recycle-bin-green.png', width: 250),
-              Container(
-                margin: EdgeInsets.only(top: 10),
-                width: MediaQuery.of(context).size.width * 0.5,
-                height: 60,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    elevation: 4,
-                    backgroundColor: Customcolors.teal,
-                    side: BorderSide(
-                      color: Customcolors.offwhite, // Border color
-                      width: 0, // Border thickness
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/Recycle-bin-green.png', width: MediaQuery.of(context).size.width * 0.4),
+            Container(
+              margin: EdgeInsets.only(top: 10),
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  elevation: 4,
+                  backgroundColor: Customcolors.teal,
+                  side: BorderSide(
+                    color: Customcolors.offwhite, // Border color
+                    width: 0, // Border thickness
                   ),
-                  onPressed: onPressed,
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 18, // Adjusts the text size inside the button
-                      fontWeight: FontWeight.bold,
-                      color: Customcolors.white,
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: onPressed,
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18, // Adjusts the text size inside the button
+                    fontWeight: FontWeight.bold,
+                    color: Customcolors.white,
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

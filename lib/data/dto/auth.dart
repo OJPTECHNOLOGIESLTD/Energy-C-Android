@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiService {
-  static const String _baseUrl = 'https://your-api-url.com';
+  static const String _baseUrl = 'https://energychleen.net/backend';
 
   // Registration API function
   Future<http.Response> register({
@@ -35,27 +35,27 @@ class ApiService {
   }
 
     // Login API function
-  Future<http.Response> login({
-    required String email,
-    required String password,
-  }) async {
-    String url = '$_baseUrl/login';
+  // Future<http.Response> login({
+  //   required String email,
+  //   required String password,
+  // }) async {
+  //   String url = '$_baseUrl/login';
 
-    Map<String, dynamic> data = {
-      'email': email,
-      'password': password,
-    };
+  //   Map<String, dynamic> data = {
+  //     'email': email,
+  //     'password': password,
+  //   };
 
-    // API call
-    var response = await http.post(
-      Uri.parse(url),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: json.encode(data),
-    );
+  //   // API call
+  //   var response = await http.post(
+  //     Uri.parse(url),
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: json.encode(data),
+  //   );
 
-    return response;
-  }
+  //   return response;
+  // }
 }
 

@@ -59,7 +59,7 @@ class WasteTypesPage extends StatelessWidget {
                     child: Text('METAL WASTE',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 40 ),
                   // Optimized ListView.builder
                   ListView.builder(
                     shrinkWrap: true,
