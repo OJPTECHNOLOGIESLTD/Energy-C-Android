@@ -33,7 +33,8 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Navigate to OnboardingScreen after 3 seconds
     Timer(Duration(seconds: 3), () {
-      AuthController.instance.isLoggedIn.value ? CustomBottomNav() : Navigator.pushReplacement(
+      // AuthController.instance.isLoggedIn.value ? CustomBottomNav() :
+       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => OnboardingScreen()),
       );
