@@ -1,3 +1,4 @@
+import 'package:energy_chleen/Pages/screens/recycle_report/how_it_works.dart';
 import 'package:energy_chleen/appbars/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +87,9 @@ class MyPointsPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                   Text('Achievements'),
-                  TextButton(onPressed: (){}, child: SizedBox(
+                  TextButton(onPressed: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>HowItWorksPage()));
+                  }, child: SizedBox(
                     child: Row(children: [
                       Text('How it works')
                     ],),

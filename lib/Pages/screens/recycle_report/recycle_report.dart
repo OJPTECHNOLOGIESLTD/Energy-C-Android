@@ -177,13 +177,13 @@ class _RecycleReportScreenState extends State<RecycleReportScreen> {
   // Create data for weekly view
   List<ChartData> _createWeeklyData() {
     return [
-      ChartData('Monday', 4),
-      ChartData('Tuesday', 6),
-      ChartData('Wednesday', 8),
-      ChartData('Thursday', 10),
-      ChartData('Friday', 12),
-      ChartData('Saturday', 14),
-      ChartData('Sunday', 16),
+      ChartData('Mon', 4),
+      ChartData('Tue', 6),
+      ChartData('Wed', 8),
+      ChartData('Thur', 10),
+      ChartData('Fri', 12),
+      ChartData('Sat', 14),
+      ChartData('Sun', 16),
     ];
   }
 
@@ -209,13 +209,13 @@ class _RecycleReportScreenState extends State<RecycleReportScreen> {
   // Helper function to get the name of the current day
   String _getDayName(int day) {
     List<String> days = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday'
+      'Mon',
+      'Tue',
+      'Wed',
+      'Thur',
+      'Fri',
+      'Sat',
+      'Sun'
     ];
     return days[day - 1];
   }
