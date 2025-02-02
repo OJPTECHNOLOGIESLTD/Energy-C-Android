@@ -1,7 +1,7 @@
-import 'package:energy_chleen/navbar/homepage.dart';
-import 'package:energy_chleen/navbar/orderspage.dart';
-import 'package:energy_chleen/navbar/profile.dart';
-import 'package:energy_chleen/navbar/storepage.dart';
+import 'package:energy_chleen/screens/navbar/homepage.dart';
+import 'package:energy_chleen/screens/navbar/orderspage.dart';
+import 'package:energy_chleen/screens/navbar/profile.dart';
+import 'package:energy_chleen/screens/navbar/storepage.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

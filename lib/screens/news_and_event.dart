@@ -1,5 +1,5 @@
-import 'package:energy_chleen/Pages/screens/homepage/news_and_event_card.dart';
-import 'package:energy_chleen/appbars/appbars.dart';
+import 'package:energy_chleen/screens/cards/news_and_event_card.dart';
+import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:flutter/material.dart';
 
 class NewsAndEvent extends StatelessWidget {

@@ -1,7 +1,7 @@
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/home_pickup.dart';
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/recyclingpage.dart';
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/waste_info.dart';
-import 'package:energy_chleen/appbars/appbars.dart';
+import 'package:energy_chleen/screens/home_pickup.dart';
+import 'package:energy_chleen/screens/recyclingpage.dart';
+import 'package:energy_chleen/screens/wastes/waste_info.dart';
+import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
@@ -173,7 +173,7 @@ class _RequestSummaryState extends State<RequestSummary> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            RecyclingScheduleProgress(isReviewing: true, isCompleted: false),
+            RecyclingScheduleProgress(isReviewing: true, isCompleted: false, isTakingPhoto: false,),
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(

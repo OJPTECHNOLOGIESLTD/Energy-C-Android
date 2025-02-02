@@ -1,5 +1,5 @@
-import 'package:energy_chleen/Auth/signup.dart';
-import 'package:energy_chleen/navbar/navbar.dart';
+import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
+import 'package:energy_chleen/screens/navbar/navbar.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -18,21 +18,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Customcolors.teal.withOpacity(0.95),
-        leading: IconButton(
-          icon: Icon(
-            Icons
-                .arrow_back_ios_sharp, // Your custom icon, you can use any icon you want
-            color: Colors.white, // Change the color of the icon
-          ),
-          onPressed: () {
-            Navigator.pop(
-                context); // This will pop the current screen and go back
-          },
-        ),
-        toolbarHeight: 40,
-      ),
       body: DecoratedBox(
         decoration: BoxDecoration(
             image: DecorationImage(
@@ -59,6 +44,7 @@ class _LoginState extends State<Login> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      SizedBox(height: 40),
                       Text(
                         "Welcome Back!",
                         style: TextStyle(

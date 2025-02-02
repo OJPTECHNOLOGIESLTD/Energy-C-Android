@@ -1,4 +1,4 @@
-import 'package:energy_chleen/Pages/onboarding_screen/get_started.dart';
+import 'package:energy_chleen/screens/onboarding_screen/get_started.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

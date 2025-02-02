@@ -12,7 +12,7 @@ class AuthController extends GetxController {
   var firstName = "".obs;
   var lastName = "".obs;
 
-  final String baseUrl = "https://energychleen.net/backend"; // Replace with energy chleen actual backend URL
+  final String baseUrl = "https://54f7005e-c626-423e-8c42-5580a9c9d43b.mock.pstmn.io"; // Replace with energy chleen actual backend URL
 
   @override
   void onInit() {
@@ -111,4 +111,6 @@ class AuthController extends GetxController {
     firstName.value =prefs.getString("firstName") ?? "Guest";
     lastName.value =prefs.getString("lastName") ?? "";
   }
+
+  // TODO:create a function for deleleting account
 }

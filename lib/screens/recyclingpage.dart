@@ -1,5 +1,5 @@
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/pickup_details.dart';
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/request_summary.dart';
+import 'package:energy_chleen/screens/pickup_details.dart';
+import 'package:energy_chleen/screens/request_summary.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';

@@ -1,5 +1,5 @@
-import 'package:energy_chleen/Auth/login.dart';
-import 'package:energy_chleen/Auth/signup.dart';
+import 'package:energy_chleen/screens/Auth_Screens/login.dart';
+import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 

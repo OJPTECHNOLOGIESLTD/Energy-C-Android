@@ -1,5 +1,5 @@
-import 'package:energy_chleen/Pages/screens/recycle_report/how_it_works.dart';
-import 'package:energy_chleen/appbars/appbars.dart';
+import 'package:energy_chleen/screens/how_it_works.dart';
+import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
@@ -132,19 +132,35 @@ class MyPointsPage extends StatelessWidget {
                 Center(
                   child: Text(
                     '20/50 Recycle Needed For The Next Level',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),
                 
                 SizedBox(height: 24),
                 
                 // Point Redemption History Section
-                Text(
-                  'Point Redemption History',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      textAlign: TextAlign.left,
+                      'Point Redemption History',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                    
+                    SizedBox(height: 16),
+                    Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Item Purchased',style: TextStyle( fontWeight: FontWeight.w400),),
+                      Text('Points Redeemed',style: TextStyle( fontWeight: FontWeight.w400),),
+                      Text('Balance Paid',style: TextStyle( fontWeight: FontWeight.w400),),
+                    ],
+                   ),
+                   SizedBox(height: 16),
+                   Text('Today', style: TextStyle(color: Colors.grey.shade700,fontWeight: FontWeight.w400),)
+                  ],
                 ),
-                
-                SizedBox(height: 16),
                 
                 // History Card
                 Card(

@@ -1,4 +1,4 @@
-import 'package:energy_chleen/Pages/screens/pickups_recycle_pages/request_summary.dart';
+import 'package:energy_chleen/screens/request_summary.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

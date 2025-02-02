@@ -1,20 +1,10 @@
-import 'package:energy_chleen/Pages/screens/homepage/news_and_event.dart';
-import 'package:energy_chleen/Pages/screens/recycle_report/my_points.dart';
-import 'package:energy_chleen/Pages/screens/waste_type.dart';
+import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
+import 'package:energy_chleen/screens/news_and_event.dart';
+import 'package:energy_chleen/screens/my_points.dart';
+import 'package:energy_chleen/screens/wastes/waste_type.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ProfilePage(),
-    );
-  }
-}
 
 class ProfilePage extends StatelessWidget {
   @override
@@ -113,7 +103,12 @@ class ProfilePage extends StatelessWidget {
                   context,
                   icon: Icons.delete,
                   title: 'Delete Account',
-                  onTap: () {},
+                  onTap: () {
+                       showDialog(
+                context: context,
+                builder: (BuildContext context) => _buildDeleteAccountPopup(context)
+              );
+                  },
                 ),
                 _buildListTile(
                   context,
@@ -132,6 +127,97 @@ class ProfilePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+  Widget _buildDeleteAccountPopup(BuildContext context) {
+    return Dialog(
+      elevation: 10,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Confirmation Message',
+              style: TextStyle(
+                  fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+            ),
+            SizedBox(height: 20),
+            _buildWarning(context: context),
+            SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Signup()),
+      ),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  backgroundColor: Colors.teal.shade700,
+                ),
+                child: Text('Proceed', style: TextStyle(fontSize: 16, color: Customcolors.white)),
+              ),
+            ),
+            SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  backgroundColor: Colors.teal.shade700,
+                ),
+                child: Text('Back', style: TextStyle(fontSize: 16, color: Customcolors.white)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWarning({
+    required BuildContext context,
+  }) {
+    return Column(
+      children: [
+        SizedBox(height: 20,),
+        Text('Are you sure you want to delete your account?'),
+        SizedBox(height: 20,),
+        
+         Column(
+           children: [
+            Text('Deleting your account will result in the following:\n\n1. Loss of all your account data.\n2. Inability to recover your account information.'),
+        SizedBox(height: 20,),
+             RichText(
+                  softWrap: true,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.visible,
+                            text: TextSpan(
+                              text: '⚠ Note: ',
+                              style: TextStyle(color: Customcolors.red, fontWeight: FontWeight.w500),
+                              children: [
+                                TextSpan(
+                                  text: 'This action is irreversible, please consider the consequences before proceeding',
+                                  style: TextStyle(
+                                      color: Customcolors.red,
+                                      fontWeight: FontWeight.normal),
+                                ),
+                              ],
+                            ),
+                          ),
+           ],
+         ),
+      ],
     );
   }
 

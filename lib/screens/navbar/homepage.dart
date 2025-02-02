@@ -1,7 +1,7 @@
-import 'package:energy_chleen/Pages/screens/homepage/news_and_event_card.dart';
-import 'package:energy_chleen/Pages/screens/homepage/profile_card_info.dart';
-import 'package:energy_chleen/Pages/screens/homepage/start_recycling_waste.dart';
-import 'package:energy_chleen/appbars/appbars.dart';
+import 'package:energy_chleen/screens/cards/news_and_event_card.dart';
+import 'package:energy_chleen/screens/cards/profile_card_info.dart';
+import 'package:energy_chleen/screens/start_recycling_waste.dart';
+import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 

@@ -1,5 +1,5 @@
-import 'package:energy_chleen/Pages/screens/recycle_report/my_points.dart';
-import 'package:energy_chleen/Pages/screens/recycle_report/recycle_report.dart';
+import 'package:energy_chleen/screens/my_points.dart';
+import 'package:energy_chleen/screens/recycle_report.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 

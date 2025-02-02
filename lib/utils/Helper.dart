@@ -243,52 +243,60 @@ class _ReuseableTextformfieldState extends State<ReuseableTextformfield> {
 // recycling schedule progress
 class RecyclingScheduleProgress extends StatelessWidget {
   final bool isReviewing;
+  final bool isTakingPhoto;
   final bool isCompleted;
   
   const RecyclingScheduleProgress({
     super.key,
     required this.isReviewing,
-    required this.isCompleted,
+    required this.isCompleted, required this.isTakingPhoto,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          SizedBox(height: 30,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.location_on, color: Customcolors.teal),
-                  SizedBox(width: 8),
-                  Text(
-                    '- - - - - - - - - - - - -',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Customcolors.teal,
-                    ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: [
+            SizedBox(height: 30,),
+            Row(
+               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.location_on, color: Customcolors.teal),
+                Text(
+                  '- - - - -',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Customcolors.teal,
                   ),
-                  Icon(Icons.edit, color: isReviewing ? Customcolors.teal : Colors.grey),
-                  Text(
-                    '- - - - - - - - - - - - -',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: Customcolors.teal,
-                    ),
+                ),
+                Icon(Icons.edit, color: isReviewing ? Customcolors.teal : Colors.grey),
+                Text(
+                  '- - - - -',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Customcolors.teal,
                   ),
-                ],
-              ),
-              Icon(Icons.check_circle, color: isCompleted ? Customcolors.teal : Colors.grey),
-            ],
-          ),
-          SizedBox(height: 20),
-        ],
+                ),
+                Icon(Icons.camera_alt, color: isTakingPhoto ? Customcolors.teal : Colors.grey),
+                Text(
+                  '- - - - -',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: Customcolors.teal,
+                  ),
+                ),
+                Icon(Icons.check_circle, color: isCompleted ? Customcolors.teal : Colors.grey),
+              ],
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
