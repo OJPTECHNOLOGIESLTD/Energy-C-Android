@@ -1,10 +1,9 @@
 import 'dart:async';
-
 import 'package:energy_chleen/screens/Auth_Screens/login.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
+import 'package:energy_chleen/screens/navbar/navbar.dart';
 import 'package:energy_chleen/screens/onboarding_screen/onboarding.dart';
 import 'package:energy_chleen/data/dto/auth_controller.dart';
-import 'package:energy_chleen/screens/navbar/homepage.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +14,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
   Get.put(AuthController()); // injecting authcontroller
+  
 }
 
 class MyApp extends StatelessWidget {
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       getPages: [
         GetPage(name: "/", page: ()=>SplashScreen()),
-        GetPage(name: "/homepage", page: ()=>HomePage()),
+        GetPage(name: "/homepage", page: ()=>CustomBottomNav()),
         GetPage(name: "/login", page: ()=>Login()),
         GetPage(name: "/signup", page: ()=>Signup()),
       ],
@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Navigate to OnboardingScreen after 3 seconds
     Timer(Duration(seconds: 3), () {
-      // AuthController.instance.isLoggedIn.value ? CustomBottomNav() :
+      AuthController.instance.isLoggedIn.value ? Get.offAllNamed('homepage') :
        Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => OnboardingScreen()),

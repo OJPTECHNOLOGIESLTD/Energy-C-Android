@@ -13,13 +13,52 @@ bool isChecked = false;
 
 class _SignupState extends State<Signup> {
 
+  // uncomment if need be
+  // File? _profilePicture; // Profile picture file
+  // final picker = ImagePicker();
+
+  // // Method to pick image from gallery
+  // Future<void> _pickImageFromGallery() async {
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _profilePicture = File(pickedFile.path);
+  //     });
+  //   }
+  // }
+
+  // // Method to pick image from camera
+  // Future<void> _pickImageFromCamera() async {
+  //   final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _profilePicture = File(pickedFile.path);
+  //     });
+  //   }
+  // }
+
+  // // Registration button handler
+  // void _registerUser() {
+  //   AuthController.instance.register(
+  //     _firstNameController.text,
+  //     _lastNameController.text,
+  //     _passwordController.text,
+  //     _emailController.text,
+  //     _phoneController.text,
+  //     _profilePicture, // Pass the selected profile picture
+  //   );
+  // }
+
   // Form input controllers
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +107,7 @@ class _SignupState extends State<Signup> {
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 20),
-                    
+
                     // textfield
                     ReuseableTextformfield(
                       controller: _firstNameController,
@@ -89,7 +128,7 @@ class _SignupState extends State<Signup> {
                       topTitle: 'Last Name',
                       hintText: 'Your last name',
                       validator: (value) {
-                        if (value==null || value.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return 'Last name is required';
                         }
                         return null;
@@ -104,7 +143,9 @@ class _SignupState extends State<Signup> {
                       hintText: 'example@gmail.com',
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value==null || value.isEmpty || !value.contains('@')) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            !value.contains('@')) {
                           return 'Please enter a valid email';
                         }
                         return null;
@@ -119,7 +160,7 @@ class _SignupState extends State<Signup> {
                       hintText: '080*******95',
                       keyboardType: TextInputType.phone,
                       validator: (value) {
-                        if (value==null || value.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return 'Phone number is required';
                         }
                         return null;
@@ -134,7 +175,7 @@ class _SignupState extends State<Signup> {
                       hintText: 'Password',
                       isPasswordField: true,
                       validator: (value) {
-                        if (value==null || value.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return 'Password is required';
                         }
                         return null;
@@ -149,7 +190,7 @@ class _SignupState extends State<Signup> {
                       hintText: 'Confirm Password',
                       isPasswordField: true,
                       validator: (value) {
-                        if (value==null || value.isEmpty) {
+                        if (value == null || value.isEmpty) {
                           return 'Confirm Password is required';
                         }
                         return null;
@@ -208,8 +249,8 @@ class _SignupState extends State<Signup> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Customcolors.offwhite,
-                        minimumSize: Size(500,
-                            60), // Adjusts the button size (width, height)
+                        minimumSize: Size(
+                            500, 60), // Adjusts the button size (width, height)
                         side: BorderSide(
                           color: Customcolors.offwhite, // Border color
                           width: 0, // Border thickness
@@ -220,21 +261,28 @@ class _SignupState extends State<Signup> {
                         ),
                       ),
                       onPressed: () {
-                        if (isChecked==true) {
+                        if (isChecked == true) {
                           // Navigate to homepage here
+                          AuthController.instance.fetchUserDetails();
                           AuthController.instance.register(
                             _firstNameController.text,
                             _lastNameController.text,
                             _passwordController.text,
                             _emailController.text,
-                            _phoneController.text);                         
-                        }else{
+                            _phoneController.text
+                          );
+
+                          // showDialog(
+                          //     context: context,
+                          //     builder: (BuildContext context) =>
+                          //         _buildProfileImagePopup(context));
+                        } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor: Customcolors.orange,
-                              content: Text(
-                                textAlign: TextAlign.center,
-                                'you have agreed to our privacy and policy')),
+                                backgroundColor: Customcolors.orange,
+                                content: Text(
+                                    textAlign: TextAlign.center,
+                                    'you have agreed to our privacy and policy')),
                           );
                         }
                         print("Sign up now!");
@@ -243,13 +291,13 @@ class _SignupState extends State<Signup> {
                         "SIGN UP",
                         style: TextStyle(
                           fontSize:
-                              18, // Adjusts the text size inside the button 
+                              18, // Adjusts the text size inside the button
                           fontWeight: FontWeight.bold,
                           color: Customcolors.black,
                         ),
                       ),
                     ),
-                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                   ],
                 ),
               ),
@@ -259,4 +307,89 @@ class _SignupState extends State<Signup> {
       ),
     );
   }
+
+  // Widget _buildProfileImagePopup(BuildContext context) {
+  //   return Dialog(
+  //     elevation: 10,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+  //     backgroundColor: Colors.white,
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Text(
+  //             'Please Add a profile photo',
+  //             style: TextStyle(
+  //                 fontSize: 20,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: Colors.black),
+  //           ),
+  //           SizedBox(height: 20),
+  //           GestureDetector(
+  //             onTap: () {
+  //               _pickImageFromCamera();
+  //             },
+  //             child: Container(
+  //               height: 150,
+  //               width: MediaQuery.of(context).size.width,
+  //               padding: EdgeInsets.symmetric(horizontal: 0, vertical: 16),
+  //               child: Card(
+  //                 elevation: 10,
+  //                 color: Customcolors.offwhite,
+  //                 child: Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Icon(Icons.camera_alt_outlined,
+  //                     size: 50,
+  //                     color: Colors.black54,),
+  //                     Text('Take A Photo', style: TextStyle(fontWeight: FontWeight.w500, color: Colors.black54),)
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           // Profile picture preview
+  //         if (_profilePicture != null)
+  //           Image.file(_profilePicture!, height: 100, width: 100),
+  //           SizedBox(height: 30),
+  //           if(_profilePicture!=null)
+  //           SizedBox(
+  //             width: double.infinity,
+  //             child: ElevatedButton(
+  //               onPressed: () => _registerUser(),
+  //               style: ElevatedButton.styleFrom(
+  //                 padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(30),
+  //                 ),
+  //                 backgroundColor: Colors.teal.shade700,
+  //               ),
+  //               child: Text('Done',
+  //                   style: TextStyle(fontSize: 16, color: Customcolors.white)),
+  //             ),
+  //           ),
+  //           SizedBox(height: 10),
+  //           SizedBox(
+  //             width: double.infinity,
+  //             child: ElevatedButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               style: ElevatedButton.styleFrom(
+  //                 padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(30),
+  //                 ),
+  //                 backgroundColor: Colors.teal.shade700,
+  //               ),
+  //               child: Text('Back',
+  //                   style: TextStyle(fontSize: 16, color: Customcolors.white)),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+
 }
