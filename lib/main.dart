@@ -14,8 +14,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
   Get.put(AuthController()); // injecting authcontroller
-  
-}
+  }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -68,11 +67,20 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     // Navigate to OnboardingScreen after 3 seconds
     Timer(Duration(seconds: 3), () {
-      AuthController.instance.isLoggedIn.value ? Get.offAllNamed('homepage') :
-       Navigator.pushReplacement(
+      AuthController authController = Get.find<AuthController>();
+      // AuthController.instance.isLoggedIn.value ? Get.offAllNamed('homepage') :
+      //  Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => OnboardingScreen()),
+      // );
+      if (authController.isLoggedIn.value) {
+        Get.offAllNamed('/homepage');  // Navigate to homepage if logged in
+      } else {
+        Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => OnboardingScreen()),
       );
+      }
     });
   }
 

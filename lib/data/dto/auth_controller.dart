@@ -56,87 +56,77 @@ Future<void> register(String firstName, String lastName, String password, String
   }
 }
 
-// uncomment if need be
-
-// Future<void> register(String firstName, String lastName, String password, String email, String phoneNumber, File? profilePicture) async {
-//   try {
-//     var request = http.MultipartRequest(
-//       'POST',
-//       Uri.parse("$baseUrl/users/register"),
-//     );
-
-//     // Add text fields
-//     request.fields['firstName'] = firstName;
-//     request.fields['lastName'] = lastName;
-//     request.fields['email'] = email;
-//     request.fields['password'] = password;
-//     request.fields['phoneNumber'] = phoneNumber;
-
-//     // Add profile picture if it exists
-//     if (profilePicture != null) {
-//       request.files.add(await http.MultipartFile.fromPath(
-//         'profile_picture', 
-//         profilePicture.path,
-//         filename: basename(profilePicture.path),
-//       ));
-//     }
-
-//     // Send request
-//     final response = await request.send();
-//     final responseBody = await http.Response.fromStream(response);
-
-//     if (response.statusCode == 201) { // Assuming 201 for success
-//       Get.snackbar(
-//         backgroundColor: Customcolors.green,
-//         colorText: Customcolors.white,
-//         "Success", "Account created! logging in..."
-//       );
-//       Get.offAllNamed('homepage');
-//     } else {
-//       var responseData = jsonDecode(responseBody.body);
-//       Get.snackbar(
-//         backgroundColor: Customcolors.red,
-//         colorText: Customcolors.white,
-//         "Error", responseData['message'] ?? 'Registration failed'
-//       );
-//     }
-//   } catch (e) {
-//     Get.snackbar(
-//       backgroundColor: Customcolors.red,
-//       colorText: Customcolors.white,
-//       "Error", e.toString()
-//     );
-//   }
-// }
-
   // Login Method
   Future<void> login(String email, String password) async {
-    try {
-      final response = await http.post(
-        Uri.parse("$baseUrl/auth/login"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
-      );
+  try {
+    final response = await http.post(
+      Uri.parse("$baseUrl/auth/login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"email": email, "password": password}),
+    );
 
-      if (response.statusCode == 200) {
-        Get.snackbar(
-          backgroundColor: Customcolors.green,
-          colorText: Customcolors.white,
-          "Success", "Logged in successfully!");
-        Get.offAllNamed('homepage');
-      } else {
-        Get.snackbar(
-          backgroundColor: Customcolors.red,
-          colorText: Customcolors.white,
-          "Error", "Invalid credentials");
-      }
-    } catch (e) {
+    if (response.statusCode == 200) {
+      // Parse the response to extract the token
+      final responseData = json.decode(response.body);
+      String fetchedToken = responseData['token'] ?? "";
+
+      // Save token and user info to SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("token", fetchedToken);
+      await prefs.setString("firstName", responseData['firstName'] ?? "");
+      await prefs.setString("lastName", responseData['lastName'] ?? "");
+
+      token.value = fetchedToken;
+      firstName.value = responseData['firstName'] ?? "";
+      lastName.value = responseData['lastName'] ?? "";
+      isLoggedIn.value = true;
+
+      Get.snackbar(
+        backgroundColor: Customcolors.green,
+        colorText: Customcolors.white,
+        "Success", "Logged in successfully!");
+      Get.offAllNamed('homepage');
+    } else {
       Get.snackbar(
         backgroundColor: Customcolors.red,
         colorText: Customcolors.white,
-        "Error", e.toString());
+        "Error", "Invalid credentials");
     }
+  } catch (e) {
+    Get.snackbar(
+      backgroundColor: Customcolors.red,
+      colorText: Customcolors.white,
+      "Error", e.toString());
   }
+}
+
+  // Future<void> login(String email, String password) async {
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse("$baseUrl/auth/login"),
+  //       headers: {"Content-Type": "application/json"},
+  //       body: jsonEncode({"email": email, "password": password}),
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       Get.snackbar(
+  //         backgroundColor: Customcolors.green,
+  //         colorText: Customcolors.white,
+  //         "Success", "Logged in successfully!");
+  //       Get.offAllNamed('homepage');
+  //     } else {
+  //       Get.snackbar(
+  //         backgroundColor: Customcolors.red,
+  //         colorText: Customcolors.white,
+  //         "Error", "Invalid credentials");
+  //     }
+  //   } catch (e) {
+  //     Get.snackbar(
+  //       backgroundColor: Customcolors.red,
+  //       colorText: Customcolors.white,
+  //       "Error", e.toString());
+  //   }
+  // }
 
   // Logout Method
   Future<void> logout() async {
@@ -145,25 +135,19 @@ Future<void> register(String firstName, String lastName, String password, String
     await prefs.remove("firstName");
     await prefs.remove("lastName");
     token.value = "";
-    firstName.value = "s";
+    firstName.value = "";
     lastName.value = "";
     isLoggedIn.value = false;
     Get.offAllNamed("/login");
   }
 
-  // // Check if User is Logged In
-  // Future<void> checkLoginStatus() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   token.value = prefs.getString("token") ?? "";
-  //   firstName.value = prefs.getString("firstName") ?? "Guest";
-  //   lastName.value = prefs.getString("lastName") ?? "";
-  //   isLoggedIn.value = token.value.isNotEmpty;
-  // }
-
+  // Check if User is Logged In
   Future<void> checkLoginStatus() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   token.value = prefs.getString("token") ?? "";
   isLoggedIn.value = token.value.isNotEmpty;
+  firstName.value = prefs.getString("firstName") ?? "";
+  lastName.value = prefs.getString("lastName") ?? "";
 
   if (isLoggedIn.value) {
     print(firstName.value);
@@ -176,7 +160,7 @@ Future<void> register(String firstName, String lastName, String password, String
 }
 
 Future<void> fetchUserDetails() async {
-  final url = "$baseUrl/user/info"; // Replace with your backend endpoint
+  final url = "$baseUrl/user/info"; // Replace with backend endpoint
 
   try {
     final response = await http.get(

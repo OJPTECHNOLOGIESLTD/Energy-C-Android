@@ -5,7 +5,7 @@ import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 
 class ProfileCardInfo extends StatefulWidget {
-  const ProfileCardInfo({super.key});
+  const ProfileCardInfo({super.key, required String profileInfo});
 
   @override
   State<ProfileCardInfo> createState() => _ProfileCardInfoState();

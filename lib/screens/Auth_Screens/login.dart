@@ -107,7 +107,6 @@ class _LoginState extends State<Login> {
                           print("Sign up now!");
                           AuthController.instance.fetchUserDetails();
                           AuthController.instance.login(_emailController.text, _passwordController.text);
-                          // Navigator.push(context, MaterialPageRoute(builder: (context)=> CustomBottomNav()));
                         },
                         child: Text(
                           "LOG IN",

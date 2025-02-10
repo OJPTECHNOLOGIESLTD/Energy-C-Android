@@ -1,0 +1,52 @@
+// uncomment if need be
+
+// Future<void> register(String firstName, String lastName, String password, String email, String phoneNumber, File? profilePicture) async {
+//   try {
+//     var request = http.MultipartRequest(
+//       'POST',
+//       Uri.parse("$baseUrl/users/register"),
+//     );
+
+//     // Add text fields
+//     request.fields['firstName'] = firstName;
+//     request.fields['lastName'] = lastName;
+//     request.fields['email'] = email;
+//     request.fields['password'] = password;
+//     request.fields['phoneNumber'] = phoneNumber;
+
+//     // Add profile picture if it exists
+//     if (profilePicture != null) {
+//       request.files.add(await http.MultipartFile.fromPath(
+//         'profile_picture', 
+//         profilePicture.path,
+//         filename: basename(profilePicture.path),
+//       ));
+//     }
+
+//     // Send request
+//     final response = await request.send();
+//     final responseBody = await http.Response.fromStream(response);
+
+//     if (response.statusCode == 201) { // Assuming 201 for success
+//       Get.snackbar(
+//         backgroundColor: Customcolors.green,
+//         colorText: Customcolors.white,
+//         "Success", "Account created! logging in..."
+//       );
+//       Get.offAllNamed('homepage');
+//     } else {
+//       var responseData = jsonDecode(responseBody.body);
+//       Get.snackbar(
+//         backgroundColor: Customcolors.red,
+//         colorText: Customcolors.white,
+//         "Error", responseData['message'] ?? 'Registration failed'
+//       );
+//     }
+//   } catch (e) {
+//     Get.snackbar(
+//       backgroundColor: Customcolors.red,
+//       colorText: Customcolors.white,
+//       "Error", e.toString()
+//     );
+//   }
+// }
