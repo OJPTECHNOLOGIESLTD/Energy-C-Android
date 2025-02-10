@@ -100,16 +100,20 @@ class _RequestSummaryState extends State<RequestSummary> {
     }
 
     if (wasteCards.isEmpty) {
-      return Center(
-        child: Text(
-          'No Waste To Recycle',
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+      return SizedBox(
+        height: MediaQuery.of(context).size.height *0.6,
+        child: Center(
+          child: Text(
+            textAlign: TextAlign.center,
+            'No Waste To Recycle',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
         ),
       );
     }
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.5,
+      height: MediaQuery.of(context).size.height * 0.6,
       child: ListView.separated(
         itemCount: wasteCards.length,
         itemBuilder: (context, index) => wasteCards[index],
@@ -240,6 +244,24 @@ class _RequestSummaryState extends State<RequestSummary> {
               ],
             ),
             _buildWasteTypeAndDetails(),
+
+            
+if (wasteCards.isNotEmpty)
+             GestureDetector(
+              onTap: (){},
+               child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Customcolors.teal
+                      ),
+                      child: Text('Next',
+                      textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.bold,
+                          color: Customcolors.white)),
+                    ),
+             )
           ],
         ),
       ),

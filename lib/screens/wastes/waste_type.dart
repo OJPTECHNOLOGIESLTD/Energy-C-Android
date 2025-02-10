@@ -1,6 +1,9 @@
 import 'package:energy_chleen/screens/navbar/appbars.dart';
+import 'package:energy_chleen/screens/recyclingpage.dart';
+import 'package:energy_chleen/screens/start_recycling_waste.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 class WasteTypesPage extends StatelessWidget {
   final List<Map<String, String>> metalWaste = [
@@ -53,18 +56,7 @@ class WasteTypesPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Customcolors.teal
-                    ),
-                    child: Text('METAL WASTE',
-                    textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.bold,
-                        color: Customcolors.white)),
-                  ),
+                 _buildwWasteTypeContainer(context: context, title: 'METAL WASTE'),
                   SizedBox(height: 40 ),
                   // Optimized ListView.builder
                   ListView.builder(
@@ -74,6 +66,7 @@ class WasteTypesPage extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final waste = metalWaste[index];
                       return buildWasteItem(
+                        context: context,
                         imagePath: waste['image']!,
                         name: waste['name']!,
                         price: waste['price']!,
@@ -82,13 +75,7 @@ class WasteTypesPage extends StatelessWidget {
                   ),
                   SizedBox(height: 16),
                   // Paper Waste Section
-                  ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-                    onPressed: () {},
-                    child: Text('PAPER WASTE',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
+                  _buildwWasteTypeContainer(context: context, title: 'PAPER WASTE')
                 ],
               ),
             ),
@@ -101,14 +88,33 @@ class WasteTypesPage extends StatelessWidget {
   Widget buildWasteItem(
       {required String imagePath,
       required String name,
-      required String price}) {
-    return Card(
-      child: ListTile(
-        leading:
-            Image.asset(imagePath, width: 50, height: 50, fit: BoxFit.cover),
-        title: Text(name),
-        trailing: Text(price),
+      required String price,
+      required BuildContext context}) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>RecyclingPage(wasteType: name, actionType1: true,))),
+      child: Card(
+        child: ListTile(
+          leading:
+              Image.asset(imagePath, width: 50, height: 50, fit: BoxFit.cover),
+          title: Text(name),
+          trailing: Text(price),
+        ),
       ),
     );
+  }
+  Widget _buildwWasteTypeContainer({String? title,
+  required BuildContext context,}){
+    return Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Customcolors.teal
+                    ),
+                    child: Text(title!,
+                    textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold,
+                        color: Customcolors.white)),
+                  );
   }
 }

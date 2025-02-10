@@ -1,5 +1,7 @@
+import 'package:energy_chleen/data/dto/auth_service.dart';
 import 'package:energy_chleen/screens/request_summary.dart';
 import 'package:energy_chleen/utils/Helper.dart';
+import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart'; // To format the date
@@ -115,6 +117,12 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
                   context,
                   MaterialPageRoute(builder: (context) => RequestSummary()),
                 );
+                // ApiService.instance.submitHomePick(
+                // _pickupAddressController.text,
+                // _cityController.text,
+                // _stateController.text,
+                // pickupType:'Icon',
+                // _selectedDate.toString());
                 print("Next button pressed");
               },
               style: ElevatedButton.styleFrom(

@@ -1,3 +1,4 @@
+import 'package:energy_chleen/data/dto/auth_controller.dart';
 import 'package:energy_chleen/screens/my_points.dart';
 import 'package:energy_chleen/screens/recycle_report.dart';
 import 'package:energy_chleen/utils/Helper.dart';
@@ -40,7 +41,7 @@ class _ProfileCardInfoState extends State<ProfileCardInfo> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Hello, Benjamin Ezeh!',
+                                  '${AuthController.instance.firstName.value} ${AuthController.instance.lastName.value}',
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
