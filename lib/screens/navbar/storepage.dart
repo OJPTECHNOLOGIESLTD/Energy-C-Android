@@ -1,3 +1,5 @@
+import 'package:energy_chleen/data/dto/auth_service.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:flutter/material.dart';
 
@@ -5,13 +7,13 @@ class StorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    appBar: CustomAppBar(),
+      appBar: CustomAppBar(),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 40,),
+            SizedBox(height: 40),
             const Text(
               'Waste Recycle Essentials',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -35,28 +37,38 @@ class StorePage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 50),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.8,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-              ),
-              itemCount: 4, // Replace with the actual number of items
-              itemBuilder: (context, index) {
-                return _buildProductCard(
-                  context,
-                  imageUrl: index % 2 == 0
-                      ? 'https://www.toter.com/sites/default/files/styles/product_detail/public/2022-08/Toter_64Gallon_TwoWheelCan_Graystone_25564_Main.png?itok=Whjdi_dx'
-                      : 'https://img.freepik.com/free-vector/black-plastic-bag-trash-garbage-rubbish-realistic-template-polyethylene-trashbag-roll-full-waste-tied-sack-with-refuse-isolated-transparent-background_107791-3522.jpg', // Replace with real image URLs
-                  title: index % 2 == 0
-                      ? 'Eco-Friendly Waste Bag 1 pcs'
-                      : 'Mobile Waste Bin 1 pcs',
-                  price: index % 2 == 0 ? '₦500' : '₦100,000',
-                  rating: 4.5,
-                );
+            FutureBuilder<List<RecycleEssentials>>(
+              future: ApiService.instance.fetchRecycleEssentials(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No products found.'));
+                } else {
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.8,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                    ),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final product = snapshot.data![index];
+                      return _buildProductCard(
+                        context,
+                        imageUrl: product.images,
+                        title: product.title.trim(),
+                        price: product.price,
+                        rating: product.rating,
+                      );
+                    },
+                  );
+                }
               },
             ),
           ],
@@ -81,20 +93,25 @@ class StorePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-              child: Image.network(
-                imageUrl,
-                height: MediaQuery.of(context).size.height * 0.15,
-                width: double.infinity,
-                fit: BoxFit.contain,
-              ),
-            ),
+  borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+  child: Image.network(
+    imageUrl,
+    height: MediaQuery.of(context).size.height * 0.15,
+    width: double.infinity,
+    fit: BoxFit.contain,
+    errorBuilder: (context, error, stackTrace) {
+      // Provide a fallback image or widget when image fails to load
+      return Image.asset(
+        'assets/vid.jpg', // Your fallback image
+        fit: BoxFit.contain,
+      );
+    },
+  ),
+),
             Container(
-              // padding: const EdgeInsets.all(8.0),
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
                     title,
@@ -117,12 +134,13 @@ class StorePage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                    price,
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.teal),
-                  ),
+                        price,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.teal,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -134,5 +152,3 @@ class StorePage extends StatelessWidget {
     );
   }
 }
-
-

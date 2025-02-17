@@ -1,5 +1,6 @@
 import 'package:energy_chleen/data/dto/auth_controller.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
+import 'package:energy_chleen/screens/navbar/navbar.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -103,9 +104,10 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                         onPressed: () {
+                          // Navigator.push(context, MaterialPageRoute(builder: (context)=>CustomBottomNav()));
                           // Navigate to your main app screen here
                           print("Sign up now!");
-                          AuthController.instance.fetchUserDetails();
+                          AuthController.instance.fetchUserDetails;
                           AuthController.instance.login(_emailController.text, _passwordController.text);
                         },
                         child: Text(

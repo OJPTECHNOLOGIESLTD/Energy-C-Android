@@ -5,8 +5,6 @@ import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 // HomeController for managing state
 class HomeController extends GetxController {
@@ -61,7 +59,7 @@ class _HomePageState extends State<HomePage> {
                   // ProfileCardInfo will be rebuilt when profileInfo changes
                     Obx(() => ProfileCardInfo(profileInfo: homeController.profileInfo.value)),
                     
-                  NewsAndEventCard(titleBool: true,),
+                  // NewsAndEventCard(titleBool: true,),
                   StartRecyclingWaste(),
                 ],
               ),

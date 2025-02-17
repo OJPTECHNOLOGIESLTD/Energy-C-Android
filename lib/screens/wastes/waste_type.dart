@@ -1,9 +1,7 @@
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/screens/recyclingpage.dart';
-import 'package:energy_chleen/screens/start_recycling_waste.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 
 class WasteTypesPage extends StatelessWidget {
   final List<Map<String, String>> metalWaste = [

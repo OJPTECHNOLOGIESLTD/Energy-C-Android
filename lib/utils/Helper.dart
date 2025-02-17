@@ -25,13 +25,14 @@ class Customcolors {
     ],
   );
 }
-class BackImageScafford{
+
+class BackImageScafford {
   static AssetImage bgImg = AssetImage(
-          'assets/doodle.png',
-        );
+    'assets/doodle.png',
+  );
   static AssetImage authbBgImg = AssetImage(
-          'assets/img1.jpg',
-        );
+    'assets/img1.jpg',
+  );
 }
 
 // recycling waste tips
@@ -177,7 +178,8 @@ class ReuseableTextformfield extends StatefulWidget {
     this.isPasswordField = false,
     this.keyboardType = TextInputType.text,
     this.validator,
-    this.onChanged, required this.controller,
+    this.onChanged,
+    required this.controller,
   }) : super(key: key);
 
   @override
@@ -203,6 +205,7 @@ class _ReuseableTextformfieldState extends State<ReuseableTextformfield> {
           ),
           SizedBox(height: 8),
           TextFormField(
+            controller: widget.controller, // Bind the controller
             obscureText: widget.isPasswordField ? _obscurePassword : false,
             keyboardType: widget.keyboardType,
             validator: widget.validator,
@@ -245,11 +248,12 @@ class RecyclingScheduleProgress extends StatelessWidget {
   final bool isReviewing;
   final bool isTakingPhoto;
   final bool isCompleted;
-  
+
   const RecyclingScheduleProgress({
     super.key,
     required this.isReviewing,
-    required this.isCompleted, required this.isTakingPhoto,
+    required this.isCompleted,
+    required this.isTakingPhoto,
   });
 
   @override
@@ -260,9 +264,11 @@ class RecyclingScheduleProgress extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            SizedBox(height: 30,),
+            SizedBox(
+              height: 30,
+            ),
             Row(
-               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.location_on, color: Customcolors.teal),
                 Text(
@@ -273,7 +279,8 @@ class RecyclingScheduleProgress extends StatelessWidget {
                     color: Customcolors.teal,
                   ),
                 ),
-                Icon(Icons.edit, color: isReviewing ? Customcolors.teal : Colors.grey),
+                Icon(Icons.edit,
+                    color: isReviewing ? Customcolors.teal : Colors.grey),
                 Text(
                   '- - - - -',
                   style: TextStyle(
@@ -282,7 +289,8 @@ class RecyclingScheduleProgress extends StatelessWidget {
                     color: Customcolors.teal,
                   ),
                 ),
-                Icon(Icons.camera_alt, color: isTakingPhoto ? Customcolors.teal : Colors.grey),
+                Icon(Icons.camera_alt,
+                    color: isTakingPhoto ? Customcolors.teal : Colors.grey),
                 Text(
                   '- - - - -',
                   style: TextStyle(
@@ -291,7 +299,8 @@ class RecyclingScheduleProgress extends StatelessWidget {
                     color: Customcolors.teal,
                   ),
                 ),
-                Icon(Icons.check_circle, color: isCompleted ? Customcolors.teal : Colors.grey),
+                Icon(Icons.check_circle,
+                    color: isCompleted ? Customcolors.teal : Colors.grey),
               ],
             ),
             SizedBox(height: 20),
@@ -302,3 +311,11 @@ class RecyclingScheduleProgress extends StatelessWidget {
   }
 }
 
+class TextHelper {
+  TextHelper._();
+  static bool isEmail(String value) {
+    String emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+    RegExp regExp = RegExp(emailRegex);
+    return regExp.hasMatch(value);
+  }
+}

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:energy_chleen/data/dto/auth_service.dart';
 import 'package:energy_chleen/screens/Auth_Screens/login.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
 import 'package:energy_chleen/screens/navbar/navbar.dart';
@@ -14,6 +15,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
   Get.put(AuthController()); // injecting authcontroller
+  Get.lazyPut(()=>ApiService()); //or Get.lazyPut(()=>ApiService());
   }
 
 class MyApp extends StatelessWidget {

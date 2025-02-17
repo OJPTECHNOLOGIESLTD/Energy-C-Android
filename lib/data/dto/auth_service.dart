@@ -1,57 +1,135 @@
-import 'package:energy_chleen/utils/Helper.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class ApiService {
+class ApiService extends GetxService  {
   static ApiService instance = Get.find();
-  static const String _baseUrl = 'https://energychleen.net/backend';
-    // Function to submit the form
-  Future<void> submitHomePick(
-     String pickupType,
-     String address,
-     String city,
-     String state,
-     DateTime selectedDate,
-  ) async {
-    final url = Uri.parse('$_baseUrl/your-api-url.com/api/pickup');
-    
-    Map<String, dynamic> pickupData = {
-      "pickupType": pickupType,
-      "address": address,
-      "city": city,
-      "state": state,
-      "pickupDate": selectedDate.toIso8601String().substring(0, 10) // YYYY-MM-DD
-    };
-    
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode(pickupData),
-      );
+  static const String baseUrl = "https://backend.energychleen.ng/api";
 
-      if (response.statusCode == 201) {
-        // Success
-          Get.snackbar(
-        backgroundColor: Customcolors.red,
-        colorText: Customcolors.white,
-        "Success",'Pickup details submitted successfully!');
-          
-      } else {
-        var responseData = jsonDecode(response.body);
-        // Error
-        Get.snackbar(
-        backgroundColor: Customcolors.red,
-        colorText: Customcolors.white,
-        "Error", responseData['message'] ?? 'Failed to submit pickup details');
-      }
-    } catch (e) {
-    Get.snackbar(
-      backgroundColor: Customcolors.red,
-      colorText: Customcolors.white,
-      "Error", e.toString());
+    @override
+  void onInit() {
+    super.onInit();
+    fetchNewsEvents();
   }
+    // Function to submit the form
+Future<void> createOrder({
+  required String userId,
+  required List<Map<String, dynamic>> items, // List of waste items
+  required String totalWeight,
+  required String totalPrice,
+  required String pickupAddress,
+  required String city,
+  required String state,
+  required String pickupType, // Home or Station
+  String? status = 'Pending', // Default status
+  List<String>? supportingImages, // Optional images
+}) async {
+  final url = Uri.parse('$baseUrl/api/orders'); // Replace with actual URL
+
+  // Prepare the request body
+  final body = jsonEncode({
+    'userId': userId,
+    'items': items,
+    'totalWeight': totalWeight,
+    'totalPrice': totalPrice,
+    'pickupAddress': pickupAddress,
+    'city': city,
+    'state': state,
+    'pickupType': pickupType,
+    'status': status,
+    'supportingImages': supportingImages,
+  });
+
+  // Make the POST request
+  final response = await http.post(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: body,
+  );
+
+  // Handle the response
+  if (response.statusCode == 201) {
+    final responseData = jsonDecode(response.body);
+    print('Order created successfully. Order ID: ${responseData['orderId']}');
+  } else {
+    print('Failed to create order. Status code: ${response.statusCode}');
   }
 }
+Future<void> getOrderDetails(String orderId) async {
+  final url = Uri.parse('https://yourapiurl.com/api/orders/$orderId'); // Replace with actual URL
+
+  // Make the GET request
+  final response = await http.get(url);
+
+  // Handle the response
+  if (response.statusCode == 200) {
+    final responseData = jsonDecode(response.body);
+    print('Order Details: $responseData');
+  } else {
+    print('Failed to retrieve order details. Status code: ${response.statusCode}');
+  }
+}
+
+  // Fetching news and events
+Future<List<NewsEvent>> fetchNewsEvents() async {
+  try {
+    final url = Uri.parse('$baseUrl/news-events'); // Correct endpoint
+    final response = await http.get(url).timeout(
+      Duration(seconds: 10),
+    );
+
+    // Log the response body
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 201) {
+      // Check if content type is application/json
+      if (response.headers['content-type']?.contains('application/json') ?? false) {
+        List<dynamic> data = json.decode(response.body);
+        return data.map((event) => NewsEvent.fromJson(event)).toList();
+      } else {
+        throw Exception('Invalid response format. Expected JSON.');
+      }
+    } else if (response.statusCode == 404) {
+      final errorResponse = json.decode(response.body);
+      throw Exception(errorResponse['message'] ?? 'No news or events found.');
+    } else {
+      throw Exception('Failed to load news/events. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    throw Exception('Error fetching news/events: $e');
+  }
+}
+
+
+
+Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
+  try {
+    final url = Uri.parse('$baseUrl/recycle-essentials');
+    print('Requesting: $url');
+
+    final response = await http.get(url).timeout(Duration(seconds: 10));
+
+    if (response.statusCode == 201) {
+      if (response.headers['content-type']?.contains('application/json') ?? false) {
+        List<dynamic> data = json.decode(response.body);
+        return data.map((item) => RecycleEssentials.fromJson(item)).toList();
+      } else {
+        throw Exception('Invalid response format. Expected JSON.');
+      }
+    } else if (response.statusCode == 404) {
+      throw Exception('Endpoint not found. Check the URL.');
+    } else {
+      throw Exception('Failed to load recycle-essentials. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Error fetching recycle-essentials: $e');
+  }
+}
+
+}
+
 

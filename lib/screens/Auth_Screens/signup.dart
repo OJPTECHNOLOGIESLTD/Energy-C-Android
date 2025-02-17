@@ -1,6 +1,7 @@
 import 'package:energy_chleen/data/dto/auth_controller.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -12,45 +13,6 @@ class Signup extends StatefulWidget {
 bool isChecked = false;
 
 class _SignupState extends State<Signup> {
-
-  // uncomment if need be
-  // File? _profilePicture; // Profile picture file
-  // final picker = ImagePicker();
-
-  // // Method to pick image from gallery
-  // Future<void> _pickImageFromGallery() async {
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-  //   if (pickedFile != null) {
-  //     setState(() {
-  //       _profilePicture = File(pickedFile.path);
-  //     });
-  //   }
-  // }
-
-  // // Method to pick image from camera
-  // Future<void> _pickImageFromCamera() async {
-  //   final pickedFile = await picker.pickImage(source: ImageSource.camera);
-
-  //   if (pickedFile != null) {
-  //     setState(() {
-  //       _profilePicture = File(pickedFile.path);
-  //     });
-  //   }
-  // }
-
-  // // Registration button handler
-  // void _registerUser() {
-  //   AuthController.instance.register(
-  //     _firstNameController.text,
-  //     _lastNameController.text,
-  //     _passwordController.text,
-  //     _emailController.text,
-  //     _phoneController.text,
-  //     _profilePicture, // Pass the selected profile picture
-  //   );
-  // }
-
   // Form input controllers
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -59,6 +21,52 @@ class _SignupState extends State<Signup> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _otpController.dispose();
+    super.dispose();
+  }
+
+  bool _validateForm() {
+  if (_firstNameController.text.isEmpty) {
+    Get.snackbar("Error", "First name is required");
+    return false;
+  }
+  if (_lastNameController.text.isEmpty) {
+    Get.snackbar("Error", "Last name is required");
+    return false;
+  }
+  if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
+    Get.snackbar("Error", "Please enter a valid email");
+    return false;
+  }
+  if (_phoneController.text.isEmpty) {
+    Get.snackbar("Error", "Phone number is required");
+    return false;
+  }
+  if (_passwordController.text.isEmpty) {
+    Get.snackbar("Error", "Password is required");
+    return false;
+  }
+  if (_passwordController.text != _confirmPasswordController.text) {
+    Get.snackbar("Error", "Passwords do not match");
+    return false;
+  }
+  if (isChecked==false){
+    Get.snackbar("Error", "Please Accept our Private policy and terms or Use");
+    return false;
+  }
+  return true;
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -174,30 +182,13 @@ class _SignupState extends State<Signup> {
                       topTitle: 'Create Password',
                       hintText: 'Password',
                       isPasswordField: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is required';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        // Handle change
-                      },
+                      
                     ),
                     ReuseableTextformfield(
                       controller: _confirmPasswordController,
                       topTitle: 'Confirm Password',
                       hintText: 'Confirm Password',
                       isPasswordField: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Confirm Password is required';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        // Handle change
-                      },
                     ),
                     SizedBox(height: 40),
                     Row(
@@ -261,29 +252,19 @@ class _SignupState extends State<Signup> {
                         ),
                       ),
                       onPressed: () {
-                        if (isChecked == true) {
-                          // Navigate to homepage here
-                          AuthController.instance.fetchUserDetails();
+                        if ( _validateForm()) {
                           AuthController.instance.register(
-                            _firstNameController.text,
-                            _lastNameController.text,
-                            _passwordController.text,
-                            _emailController.text,
-                            _phoneController.text
+                            context,
+                            firstName: _firstNameController.text
+                                .trim(), // Use .text and trim to remove leading/trailing spaces
+                            lastName: _lastNameController.text.trim(),
+                            password: _passwordController.text.trim(),
+                            email: _emailController.text.trim(),
+                            phoneNumber: _phoneController.text
+                                .trim(),
+                                confirmPassword: _confirmPasswordController.text.trim(), // Make sure phoneNumber is trimmed as well
                           );
-
-                          // showDialog(
-                          //     context: context,
-                          //     builder: (BuildContext context) =>
-                          //         _buildProfileImagePopup(context));
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                                backgroundColor: Customcolors.orange,
-                                content: Text(
-                                    textAlign: TextAlign.center,
-                                    'you have agreed to our privacy and policy')),
-                          );
+                          ;
                         }
                         print("Sign up now!");
                       },
@@ -390,6 +371,4 @@ class _SignupState extends State<Signup> {
   //     ),
   //   );
   // }
-
-
 }
