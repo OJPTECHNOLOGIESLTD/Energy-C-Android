@@ -84,7 +84,7 @@ Future<List<NewsEvent>> fetchNewsEvents() async {
     // Log the response body
     print('Response body: ${response.body}');
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       // Check if content type is application/json
       if (response.headers['content-type']?.contains('application/json') ?? false) {
         List<dynamic> data = json.decode(response.body);
@@ -101,35 +101,7 @@ Future<List<NewsEvent>> fetchNewsEvents() async {
   } catch (e) {
     throw Exception('Error fetching news/events: $e');
   }
-}
-
-
-
-Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
-  try {
-    final url = Uri.parse('$baseUrl/recycle-essentials');
-    print('Requesting: $url');
-
-    final response = await http.get(url).timeout(Duration(seconds: 10));
-
-    if (response.statusCode == 201) {
-      if (response.headers['content-type']?.contains('application/json') ?? false) {
-        List<dynamic> data = json.decode(response.body);
-        return data.map((item) => RecycleEssentials.fromJson(item)).toList();
-      } else {
-        throw Exception('Invalid response format. Expected JSON.');
-      }
-    } else if (response.statusCode == 404) {
-      throw Exception('Endpoint not found. Check the URL.');
-    } else {
-      throw Exception('Failed to load recycle-essentials. Status code: ${response.statusCode}');
-    }
-  } catch (e) {
-    print('Error: $e');
-    throw Exception('Error fetching recycle-essentials: $e');
-  }
-}
-
+ }
 }
 
 

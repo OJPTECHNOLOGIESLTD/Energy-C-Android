@@ -1,9 +1,43 @@
-import 'package:energy_chleen/data/dto/auth_service.dart';
+import 'dart:convert';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
-class StorePage extends StatelessWidget {
+class StorePage extends StatefulWidget {
+  @override
+  State<StorePage> createState() => _StorePageState();
+}
+
+class _StorePageState extends State<StorePage> {
+
+static const String baseUrl = "https://backend.energychleen.ng/api";
+
+Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
+  try {
+    final url = Uri.parse('$baseUrl/recycle-essentials');
+    print('Requesting: $url');
+
+    final response = await http.get(url).timeout(Duration(seconds: 10));
+
+    if (response.statusCode == 200) {
+      if (response.headers['content-type']?.contains('application/json') ?? false) {
+        List<dynamic> data = json.decode(response.body);
+        return data.map((item) => RecycleEssentials.fromJson(item)).toList();
+      } else {
+        throw Exception('Invalid response format. Expected JSON.');
+      }
+    } else if (response.statusCode == 404) {
+      throw Exception('Endpoint not found. Check the URL.');
+    } else {
+      throw Exception('Failed to load recycle-essentials. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Error fetching recycle-essentials: $e');
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +72,8 @@ class StorePage extends StatelessWidget {
             ),
             const SizedBox(height: 50),
             FutureBuilder<List<RecycleEssentials>>(
-              future: ApiService.instance.fetchRecycleEssentials(),
+              future: fetchRecycleEssentials(),
+              // ApiService.instance.fetchRecycleEssentials(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -134,7 +169,7 @@ class StorePage extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        price,
+                        '₦ $price',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,

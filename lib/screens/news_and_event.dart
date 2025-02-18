@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 class NewsAndEvent extends StatelessWidget {
   const NewsAndEvent({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,8 +29,15 @@ class NewsAndEvent extends StatelessWidget {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final event = snapshot.data![index];
+                  final imageUrl = event.images.isNotEmpty
+                      ? event.images[0]
+                      : 'https://cdn-icons-png.flaticon.com/512/13434/13434972.png'; // Get the first image or fallback
+                  
                   return NewsAndEventCard(
-                    titleBool: true,
+                    titleBool: false, 
+                    description: event.description, 
+                    title: event.title, 
+                    image: imageUrl, // Pass the image URL as a string
                   );
                 },
               );
@@ -42,3 +48,4 @@ class NewsAndEvent extends StatelessWidget {
     );
   }
 }
+
