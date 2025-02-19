@@ -1,4 +1,4 @@
-import 'package:energy_chleen/data/dto/auth_controller.dart';
+import 'package:energy_chleen/data/auth_controller.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -253,18 +253,14 @@ class _SignupState extends State<Signup> {
                       ),
                       onPressed: () {
                         if ( _validateForm()) {
-                          AuthController.instance.register(
-                            context,
-                            firstName: _firstNameController.text
-                                .trim(), // Use .text and trim to remove leading/trailing spaces
-                            lastName: _lastNameController.text.trim(),
-                            password: _passwordController.text.trim(),
-                            email: _emailController.text.trim(),
-                            phoneNumber: _phoneController.text
-                                .trim(),
-                                confirmPassword: _confirmPasswordController.text.trim(), // Make sure phoneNumber is trimmed as well
-                          );
-                          ;
+                          showOtpDialog(context, email: _emailController.text.trim());
+                        AuthController.instance.register(
+  _firstNameController.text.trim(),
+  _lastNameController.text.trim(),
+  _emailController.text.trim(), // Ensure email is passed in the correct position
+  _passwordController.text.trim(),
+  _confirmPasswordController.text.trim(),
+  _phoneController.text.trim());
                         }
                         print("Sign up now!");
                       },
@@ -288,6 +284,92 @@ class _SignupState extends State<Signup> {
       ),
     );
   }
+  void showOtpDialog(
+    BuildContext context, {
+    required String email, // Make email required since you are using it
+    int maxLength = 6,
+  }) {
+    final _otpController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Enter OTP',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Please enter the 6-digit OTP sent to your email.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18),
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                style: TextStyle(fontSize: 18),
+                controller: _otpController,
+                keyboardType: TextInputType.number,
+                maxLength: maxLength,
+                decoration: InputDecoration(
+                  hintText: 'Enter OTP',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Customcolors.teal,
+              ),
+              onPressed: () async {
+                final otp = _otpController.text; // Capture the OTP here
+                if (otp.length == maxLength) {
+                  print('OTP Entered: $otp');
+                  // Call the verifyEmail function
+                  //  await  AuthController.instance.loadUserData();
+                  AuthController.instance.verifyEmail(
+                    email, // No need for a bang (!) operator
+                    otp,
+                  );
+                 
+                  Navigator.of(context).pop(); // Close the dialog
+                } else {
+                  Get.snackbar(
+                    "Failed",
+                    'Invalid OTP!',
+                    backgroundColor: Customcolors.red,
+                    colorText: Customcolors.white,
+                  );
+                  print('Invalid OTP');
+                }
+              },
+              child: Text(
+                'Submit',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
+
 
   // Widget _buildProfileImagePopup(BuildContext context) {
   //   return Dialog(

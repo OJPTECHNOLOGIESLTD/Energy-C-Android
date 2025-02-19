@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:energy_chleen/data/dto/auth_service.dart';
+import 'package:energy_chleen/data/auth_service.dart';
 import 'package:energy_chleen/screens/Auth_Screens/login.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
 import 'package:energy_chleen/screens/navbar/navbar.dart';
 import 'package:energy_chleen/screens/onboarding_screen/onboarding.dart';
-import 'package:energy_chleen/data/dto/auth_controller.dart';
+import 'package:energy_chleen/data/auth_controller.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,11 +70,6 @@ class _SplashScreenState extends State<SplashScreen> {
     // Navigate to OnboardingScreen after 3 seconds
     Timer(Duration(seconds: 3), () {
       AuthController authController = Get.find<AuthController>();
-      // AuthController.instance.isLoggedIn.value ? Get.offAllNamed('homepage') :
-      //  Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => OnboardingScreen()),
-      // );
       if (authController.isLoggedIn.value) {
         Get.offAllNamed('/homepage');  // Navigate to homepage if logged in
       } else {

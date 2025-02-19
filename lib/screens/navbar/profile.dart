@@ -1,10 +1,10 @@
-import 'package:energy_chleen/data/dto/auth_controller.dart';
+import 'package:energy_chleen/data/auth_controller.dart';
 import 'package:energy_chleen/screens/news_and_event.dart';
 import 'package:energy_chleen/screens/my_points.dart';
 import 'package:energy_chleen/screens/wastes/waste_type.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -12,9 +12,11 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   @override
   Widget build(BuildContext context) {
     AuthController.instance.checkLoginStatus();
+    final userController = Get.find<AuthController>();
     return SafeArea(
       child: Scaffold(
         body: DecoratedBox(
@@ -50,15 +52,33 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 10),
                 // Display logged-in user's first name
-                Obx(() => Text(
-                      '${AuthController.instance.firstName.value} ${AuthController.instance.lastName.value}',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    )),
-                const Text(
-                  'Level 1: Beginner',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
+                // Text(
+                //       '${AuthController.instance.firstName.value} ${AuthController.instance.lastName.value}',
+                //       style:
+                //           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                //     ),
+               Obx(() {
+                      if (userController.user.isEmpty) {
+                        return Text('No user data found');
+                      }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${userController.user['firstName']} ${userController.user['lastName']}',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18),
+                            ),
+                            Text(
+                              'Level: ${userController.user['level']}',
+                             style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {},
