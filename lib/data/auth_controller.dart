@@ -13,6 +13,7 @@ class AuthController extends GetxController {
   var isLoggedIn = false.obs;
   var token = ''.obs;
   Rx<User?> userDetails = Rx<User?>(null); // Reactive user object
+    Rx<LevelProgress?> progressDetails = Rx<LevelProgress?>(null); // Reactive user object
 
   final String baseUrl = "https://backend.energychleen.ng/api";
 
@@ -119,7 +120,7 @@ Future<void> fetchUser() async {
       // Extract the 'user' object from the responseData
       final userData = responseData['user'];
       print('User data fetched: $userData');
-
+await fetchLevelProgress();
       // Ensure userData is valid before assigning it
       if (userData != null && userData is Map<String, dynamic>) {
         userDetails.value = User.fromJson(userData); // Parse user object to User model
@@ -135,6 +136,79 @@ Future<void> fetchUser() async {
     print('Error occurred while fetching user details: $e');
   }
 }
+// Future<void> fetchLevelProgress() async {
+//   try {
+//     if (token.value.isEmpty) {
+//       print('Error: Token is null or empty');
+//       return;
+//     }
+
+//     if (userDetails.value == null) {
+//       print('Error: User details are null');
+//       return;
+//     }
+
+//     final id = userDetails.value!.id; // Ensure userDetails.value is not null before using it
+
+//     final response = await http.get(
+//       Uri.parse('$baseUrl/orders/data/$id/level-progress'),
+//       headers: {
+//         'Accept': 'application/json',
+//         'Authorization': 'Bearer ${token.value}',
+//       },
+//     );
+
+//     if (response.statusCode == 200) {
+//       final responseData = json.decode(response.body);
+
+//       // Assuming 'progress' is the correct key from the API response.
+//       final progressData = responseData['progress'];
+//       print('Progress data fetched: $progressData');
+
+//       // Ensure progressData is valid before assigning it
+//       if (progressData != null && progressData is Map<String, dynamic>) {
+//         progressDetails.value = LevelProgress.fromJson(progressData); // Parse progress object to LevelProgress model
+//         print('Progress details set successfully: ${progressDetails.value}');
+//       } else {
+//         print('Error: Progress data is null or not in expected format');
+//       }
+//     } else {
+//       print('Failed to fetch progress details: ${response.statusCode}');
+//       print('Response body: ${response.body}');
+//     }
+//   } catch (e) {
+//     print('Error occurred while fetching progress details: $e');
+//   }
+// }
+Future<void> fetchLevelProgress() async {
+  if (userDetails.value == null) {
+    print('User details are null');
+    return;
+  }
+
+  final id = userDetails.value!.id;
+  final url = Uri.parse("$baseUrl/orders/data/$id/level-progress");
+
+  try {
+    final response = await http.get(url);
+
+    print('$baseUrl/orders/data/$id/level-progress');
+    print(progressDetails.value);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      
+      // Update the reactive progressDetails variable
+      progressDetails.value = LevelProgress.fromJson(data);
+      print("Progress details fetched: ${progressDetails.value}");
+      
+    } else {
+      print("Failed to load data: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error fetching data: $e");
+  }
+}
 
 
   Future<void> logout() async {
@@ -146,16 +220,6 @@ Future<void> fetchUser() async {
     Get.offAllNamed("/login");
   }
 
-  // Future<void> checkLoginStatus() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   isLoggedIn.value =
-  //       prefs.getBool('isLoggedIn') ?? false; // Check if user is logged in
-
-  //   if (isLoggedIn.value) {
-  //     token.value = prefs.getString("token") ?? '';
-  //     await fetchUser(); // Fetch user data if logged in
-  //   }
-  // }
   Future<void> checkLoginStatus() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   token.value = prefs.getString("token") ?? '';

@@ -11,29 +11,19 @@ class MyPointsPage extends StatefulWidget {
 }
 
 class _MyPointsPageState extends State<MyPointsPage> {
-
-final authController = Get.find<AuthController>();
+  final authController = Get.find<AuthController>();
 
   @override
   void initState() {
     super.initState();
-    
     // Fetch user data if the user is already logged in
     if (authController.isLoggedIn.value) {
       authController.fetchUser();
     }
-
-    // Optional: If you want to listen for changes in login status
-    authController.isLoggedIn.listen((loggedIn) {
-      if (loggedIn) {
-        authController.fetchUser();  // Fetch user data when the user logs in
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: CustomAppBar1(title: 'My Points'),
       body: DecoratedBox(
@@ -78,14 +68,26 @@ final authController = Get.find<AuthController>();
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                           SizedBox(height: 8),
-                          Text(
-                            '20 ~ ₦200',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          Obx(() {
+                            // Check if the user is logged in and display user details
+                            if (authController.isLoggedIn.value) {
+                              return authController.userDetails.value != null
+                                  ? Text(
+                                      '${authController.userDetails.value!.points} ~ ₦200',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.7,
+                                    child: ShimmerEffects(height: 0.03));
+                            } else {
+                              return Text(
+                                  ''); // return blank if user is not logged in
+                            }
+                          }),
                         ],
                       ),
                       Switch(
@@ -134,69 +136,64 @@ final authController = Get.find<AuthController>();
                 ),
                 SizedBox(height: 24),
                 // Circular Progress Indicator for Level
-                Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        height: 140,
-                        width: 140,
-                        child: CircularProgressIndicator(
-                          strokeCap: StrokeCap.round,
-                          value: 0.2, // progress percentage (20/50 recycled)
-                          strokeWidth: 20,
-                          backgroundColor: Customcolors.offwhite,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Customcolors.teal),
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'LEVEL',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                Obx(() {
+                  if (authController.userDetails.value == null) {
+                    return ShimmerEffects(height: 0.15);
+                  }
+                  final user = authController.progressDetails.value!;
+                  final userpoint = authController.userDetails.value!;
+                  return Center(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 140,
+                          width: 140,
+                          child: CircularProgressIndicator(
+                            strokeCap: StrokeCap.round,
+                            value: userpoint.points /
+                                user.nextLevelPoints, // progress percentage (20/50 recycled)
+                            strokeWidth: 20,
+                            backgroundColor: Customcolors.offwhite,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Customcolors.teal),
                           ),
-                          Obx(() {
-          // Check if the user is logged in and display user details
-          if (authController.isLoggedIn.value) {
-            return authController.userDetails.value != null
-                ?Text(authController.userDetails.value!.level,
-                style: TextStyle(
-fontSize: 16, fontWeight: FontWeight.bold),)
-                : CircularProgressIndicator();
-          } else {
-            return Text('Please log in');
-          }
-        }),
-                          // Obx(
-                          //   () {
-                          //     if (authController.user.isEmpty) {
-                          //       return Text('0');
-                          //     }
-                          //     return Text(
-                          //       authController.user['level'],
-                          //       style: TextStyle(
-                          //           fontSize: 16, fontWeight: FontWeight.bold),
-                          //     );
-                          //   },
-                          // ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'LEVEL ${user.currentLevel}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              userpoint.level,
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }),
                 SizedBox(height: 24),
 
                 // Recycle Needed For Next Level
-                Center(
-                  child: Text(
-                    '20/50 Recycle Needed For The Next Level',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                ),
+               Obx(() {
+                    // Check if the user is logged in and display user details
+                    if (authController.userDetails.value == null) {
+                      return ShimmerEffects(height: 0.03);
+                    }
+                    final user = authController.progressDetails.value!;
+                    final userpoint = authController.userDetails.value!;
+                    return Center(
+                  child:  Text(
+                      '${userpoint.points}/${user.nextLevelPoints.toString()} Recycle Needed For The Next Level',
+                      style: TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                ); }),
 
                 SizedBox(height: 24),
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
+import 'package:energy_chleen/utils/Helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -76,7 +77,7 @@ Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
               // ApiService.instance.fetchRecycleEssentials(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return ShimmerEffects(height: 0.5);
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

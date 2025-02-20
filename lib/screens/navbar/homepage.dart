@@ -1,4 +1,4 @@
-import 'package:energy_chleen/data/auth_service.dart';
+import 'package:energy_chleen/data/api_service.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/cards/news_and_event_card.dart';
 import 'package:energy_chleen/screens/cards/profile_card_info.dart';
@@ -91,9 +91,7 @@ class _HomePageState extends State<HomePage> {
                         ApiService.instance.fetchNewsEvents(), // Fetching data
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                            child:
-                                CircularProgressIndicator()); // Loading spinner
+                        return ShimmerEffects(height: 0.15);
                       } else if (snapshot.hasError) {
                         return Center(
                             child: Text(

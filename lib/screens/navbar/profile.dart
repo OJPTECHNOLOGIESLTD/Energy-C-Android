@@ -51,34 +51,32 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Display logged-in user's first name
-                // Text(
-                //       '${AuthController.instance.firstName.value} ${AuthController.instance.lastName.value}',
-                //       style:
-                //           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                //     ),
-               Obx(() {
-                      if (userController.user.isEmpty) {
-                        return Text('No user data found');
-                      }
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${userController.user['firstName']} ${userController.user['lastName']}',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
-                            ),
-                            Text(
-                              'Level: ${userController.user['level']}',
-                             style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                Obx(() {
+                            // Check if the user is logged in and display user details
+                            if (userController.userDetails.value == null) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: ShimmerEffects(height: 0.05),
+                              );
+                              }
+                              final userDetails = userController.userDetails.value!;
+                              final progressDetails=userController.progressDetails.value!;
+                                  return Column(
+                                    children: [
+                                      Text(
+                                          '${userDetails.firstName} ${userDetails.lastName}',
+                                            style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                        ),
+                                        Text(
+                                      'Level ${progressDetails.currentLevel} ${userDetails.level}',
+                                       style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
+                                    )
+                                    ],
+                                  );
+                          }),
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {},

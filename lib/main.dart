@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:energy_chleen/data/auth_service.dart';
+import 'package:energy_chleen/data/api_service.dart';
 import 'package:energy_chleen/screens/Auth_Screens/login.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
 import 'package:energy_chleen/screens/navbar/navbar.dart';

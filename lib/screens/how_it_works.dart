@@ -154,16 +154,20 @@ class HowItWorksPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
+            SizedBox(
+                  width: 150,
+                  child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Level $level',
-                style: TextStyle(color: Customcolors.white),),
+                  style: TextStyle(color: Customcolors.white),),
+                
                 Text(
                   levelTitle,
                   style: TextStyle(color: Customcolors.white),
                 ),
               ],
+            ),
             ),
             Text('Points $points',
             style: TextStyle(color: Customcolors.white,),),
