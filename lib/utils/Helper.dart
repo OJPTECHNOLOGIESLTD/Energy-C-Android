@@ -319,8 +319,8 @@ class ShimmerEffects extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade400,
-      highlightColor: Colors.grey.shade100,
+      baseColor: Customcolors.teal,
+      highlightColor: Colors.teal.shade400,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Container(
