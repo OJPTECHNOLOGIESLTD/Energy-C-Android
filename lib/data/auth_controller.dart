@@ -94,7 +94,7 @@ class AuthController extends GetxController {
         await saveLoginResponse(responseData);
         Get.snackbar("Success", "Email verified successfully!",
             backgroundColor: Customcolors.green, colorText: Customcolors.white);
-        Get.offAllNamed('homepage');
+        Get.offAllNamed('login');
       },
     );
   }
@@ -136,50 +136,7 @@ await fetchLevelProgress();
     print('Error occurred while fetching user details: $e');
   }
 }
-// Future<void> fetchLevelProgress() async {
-//   try {
-//     if (token.value.isEmpty) {
-//       print('Error: Token is null or empty');
-//       return;
-//     }
 
-//     if (userDetails.value == null) {
-//       print('Error: User details are null');
-//       return;
-//     }
-
-//     final id = userDetails.value!.id; // Ensure userDetails.value is not null before using it
-
-//     final response = await http.get(
-//       Uri.parse('$baseUrl/orders/data/$id/level-progress'),
-//       headers: {
-//         'Accept': 'application/json',
-//         'Authorization': 'Bearer ${token.value}',
-//       },
-//     );
-
-//     if (response.statusCode == 200) {
-//       final responseData = json.decode(response.body);
-
-//       // Assuming 'progress' is the correct key from the API response.
-//       final progressData = responseData['progress'];
-//       print('Progress data fetched: $progressData');
-
-//       // Ensure progressData is valid before assigning it
-//       if (progressData != null && progressData is Map<String, dynamic>) {
-//         progressDetails.value = LevelProgress.fromJson(progressData); // Parse progress object to LevelProgress model
-//         print('Progress details set successfully: ${progressDetails.value}');
-//       } else {
-//         print('Error: Progress data is null or not in expected format');
-//       }
-//     } else {
-//       print('Failed to fetch progress details: ${response.statusCode}');
-//       print('Response body: ${response.body}');
-//     }
-//   } catch (e) {
-//     print('Error occurred while fetching progress details: $e');
-//   }
-// }
 Future<void> fetchLevelProgress() async {
   if (userDetails.value == null) {
     print('User details are null');
