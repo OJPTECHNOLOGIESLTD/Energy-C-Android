@@ -56,7 +56,7 @@ class User {
   final String lastName;
   final String email;
   final String phoneNumber;
-  final double wasteWeight;
+  final int wasteWeight;
   final int points;
   final String level;
   final bool isVerified;
@@ -98,172 +98,139 @@ class User {
   }
 }
 
+class WasteItem {
+  final String name;
+  final String? category;  // Allow category to be nullable
+  final double weight;
+  final double price;
+  final String image;
+  final String video;
+  final String description;
+  final List<Instruction> instructions;
+
+  WasteItem({
+    required this.name,
+    this.category,  // Nullable field
+    required this.weight,
+    required this.price,
+    required this.image,
+    required this.video,
+    required this.description,
+    required this.instructions,
+  });
+
+  factory WasteItem.fromJson(Map<String, dynamic> json) {
+    return WasteItem(
+      name: json['name'] ?? 'Unknown',  // Fallback if name is null
+      category: json['category'],       // This can be null
+      weight: (json['weight'] as num?)?.toDouble() ?? 0.0,  // Handle potential null
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,    // Handle potential null
+      image: json['image'] ?? '',      // Provide fallback if null
+      video: json['video'] ?? '',      // Provide fallback if null
+      description: json['description'] ?? 'No description',  // Fallback if null
+      instructions: (json['instructions'] as List)
+          .map((i) => Instruction.fromJson(i))
+          .toList(),
+    );
+  }
+}
+
+class Instruction {
+  final int id;
+  final String description;
+
+  Instruction({
+    required this.id,
+    required this.description,
+  });
+
+  factory Instruction.fromJson(Map<String, dynamic> json) {
+    return Instruction(
+      id: json['id'] ?? 0,  // Fallback to 0 if ID is null
+      description: json['description'] ?? '',  // Provide fallback if null
+    );
+  }
+}
+
+
 class Order {
-  final String id;
   final String orderId;
-  final String userId;
-  final List<Item> items;
-  final String totalWeight;
-  final String totalPrice;
+  final String status;
+  final double totalWeight;
+  final double totalPrice;
   final String date;
   final String address;
-  final City city;
-  final StateDetails state;
-  final String pickupType;
-  final String status;
-  final int points;
+  final String cityName;
+  final String stateName;
 
   Order({
-    required this.id,
     required this.orderId,
-    required this.userId,
-    required this.items,
+    required this.status,
     required this.totalWeight,
     required this.totalPrice,
     required this.date,
     required this.address,
-    required this.city,
-    required this.state,
-    required this.pickupType,
-    required this.status,
-    required this.points,
+    required this.cityName,
+    required this.stateName,
   });
 
+  // Factory method to create an Order object from JSON
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
-      id: json['id'],
       orderId: json['orderId'],
-      userId: json['userId'],
-      items: List<Item>.from(json['items'].map((item) => Item.fromJson(item))),
-      totalWeight: json['totalWeight'],
-      totalPrice: json['totalPrice'],
-      date: json['date'],
-      address: json['address'],
-      city: City.fromJson(json['city']),
-      state: StateDetails.fromJson(json['state']),
-      pickupType: json['pickupType'],
       status: json['status'],
-      points: json['points'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'orderId': orderId,
-      'userId': userId,
-      'items': items.map((item) => item.toJson()).toList(),
-      'totalWeight': totalWeight,
-      'totalPrice': totalPrice,
-      'date': date,
-      'address': address,
-      'city': city.toJson(),
-      'state': state.toJson(),
-      'pickupType': pickupType,
-      'status': status,
-      'points': points,
-    };
-  }
-}
-
-class Item {
-  final String name;
-  final String category;
-  final String weight;
-  final String price;
-  final int point;
-  final String date;
-  final String address;
-  final String image;
-  final String video;
-
-  Item({
-    required this.name,
-    required this.category,
-    required this.weight,
-    required this.price,
-    required this.point,
-    required this.date,
-    required this.address,
-    required this.image,
-    required this.video,
-  });
-
-  factory Item.fromJson(Map<String, dynamic> json) {
-    return Item(
-      name: json['name'],
-      category: json['category'],
-      weight: json['weight'],
-      price: json['price'],
-      point: json['point'],
+      totalWeight: double.parse(json['totalWeight']),
+      totalPrice: double.parse(json['totalPrice']),
       date: json['date'],
       address: json['address'],
-      image: json['image'],
-      video: json['video'],
+      cityName: json['cityId']['cityName'],
+      stateName: json['stateId']['stateName'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'category': category,
-      'weight': weight,
-      'price': price,
-      'point': point,
-      'date': date,
-      'address': address,
-      'image': image,
-      'video': video,
-    };
   }
 }
 
-class City {
-  final String id;
-  final String name;
 
-  City({required this.id, required this.name});
+// class LevelProgress {
+//   final String currentLevel;
+//   final int totalPoints;
+//   final String nextLevel;
+//   final int pointsRequired;
 
-  factory City.fromJson(Map<String, dynamic> json) {
-    return City(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
+//   LevelProgress({
+//     required this.currentLevel,
+//     required this.totalPoints,
+//     required this.nextLevel,
+//     required this.pointsRequired,
+//   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
-  }
-}
+//   factory LevelProgress.fromJson(Map<String, dynamic> json) {
+//     return LevelProgress(
+//       currentLevel: json['currentLevel'] != null ? json['currentLevel'] as String : 'Unknown',
+//       totalPoints: json['totalPoints'] != null ? json['totalPoints'] as int : 0,
+//       nextLevel: json['nextLevel'] != null ? json['nextLevel'] as String : 'Unknown',
+//       pointsRequired: json['pointsRequired'] != null ? json['pointsRequired'] as int : 0,
+//     );
+//   }
 
-class StateDetails {
-  final String id;
-  final String name;
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'currentLevel': currentLevel,
+//       'totalPoints': totalPoints,
+//       'nextLevel': nextLevel,
+//       'pointsRequired': pointsRequired,
+//     };
+//   }
 
-  StateDetails({required this.id, required this.name});
-
-  factory StateDetails.fromJson(Map<String, dynamic> json) {
-    return StateDetails(
-      id: json['id'],
-      name: json['name'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
-  }
-}
+//   @override
+//   String toString() {
+//     return 'LevelProgress(currentLevel: $currentLevel, totalPoints: $totalPoints, nextLevel: $nextLevel, pointsRequired: $pointsRequired)';
+//   }
+// }
 
 class LevelProgress {
   final int currentLevel;
   final int nextLevelPoints;
-  final double progressPercentage;
+  final int progressPercentage;
 
   LevelProgress({
     required this.currentLevel,
@@ -273,9 +240,9 @@ class LevelProgress {
 
   factory LevelProgress.fromJson(Map<String, dynamic> json) {
     return LevelProgress(
-      currentLevel: json['current_level'] as int,
-      nextLevelPoints: json['next_level_points'] as int,
-      progressPercentage: (json['progress_percentage'] as num).toDouble(),
+      currentLevel: json['current_level'],
+      nextLevelPoints: json['next_level_points'],
+      progressPercentage: json['progress_percentage'],
     );
   }
 
@@ -291,7 +258,36 @@ class LevelProgress {
   String toString() {
     return 'LevelProgress(currentLevel: $currentLevel, nextLevelPoints: $nextLevelPoints, progressPercentage: $progressPercentage)';
   }
-
-
 }
+class PurchaseModel {
+  final int purchase_id;
+  final String item_name;
+  final int quantity;
+  final double total_price;
 
+
+  PurchaseModel({
+    required this.purchase_id,
+    required this.item_name,
+    required this.quantity,
+    required this.total_price,
+  });
+
+  factory PurchaseModel.fromJson(Map<String, dynamic> json) {
+    return PurchaseModel(
+      purchase_id: json['purchase_id'],
+      item_name: json['item_name'],
+      quantity: json['quantity'],
+      total_price: json['total_price'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'purchase_id': purchase_id,
+      'item_name': item_name,
+      'quantity': quantity,
+      'total_price': total_price,
+    };
+  }
+}

@@ -64,6 +64,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +72,9 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(Duration(seconds: 3), () {
       AuthController authController = Get.find<AuthController>();
       if (authController.isLoggedIn.value) {
+            
+      authController.fetchUser();
+
         Get.offAllNamed('/homepage');  // Navigate to homepage if logged in
       } else {
         Navigator.pushReplacement(

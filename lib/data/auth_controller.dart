@@ -13,7 +13,9 @@ class AuthController extends GetxController {
   var isLoggedIn = false.obs;
   var token = ''.obs;
   Rx<User?> userDetails = Rx<User?>(null); // Reactive user object
-    Rx<LevelProgress?> progressDetails = Rx<LevelProgress?>(null); // Reactive user object
+  Rx<LevelProgress?> progressDetails = Rx<LevelProgress?>(null);
+  Rx<PurchaseModel?> purchasedModel = Rx<PurchaseModel?>(null);
+  Rx<WasteItem?> wasteDetails = Rx<WasteItem?>(null);
 
   final String baseUrl = "https://backend.energychleen.ng/api";
 
@@ -57,34 +59,46 @@ class AuthController extends GetxController {
         await saveLoginResponse(responseData);
         Get.snackbar("Success", "User registered successfully!",
             backgroundColor: Customcolors.green, colorText: Customcolors.white);
-        Get.offAllNamed('homepage');
       },
     );
   }
 
-  Future<void> login(String email, String password) async {
-    if (!isValidEmail(email)) {
-      Get.snackbar(
-        "Invalid Email",
-        "Please provide a valid email address.",
-        backgroundColor: Customcolors.red,
-        colorText: Customcolors.white,
-      );
-      return;
-    }
-
-    await _makePostRequest(
-      endpoint: 'login',
-      body: {"email": email, "password": password},
-      onSuccess: (responseData) async {
-        await saveLoginResponse(responseData);
-        isLoggedIn == true;
-        Get.snackbar("Success", "Logged in successfully!",
-            backgroundColor: Customcolors.green, colorText: Customcolors.white);
-        Get.offAllNamed('homepage');
-      },
+Future<void> login(String email, String password) async {
+  if (!isValidEmail(email)) {
+    Get.snackbar(
+      "Invalid Email",
+      "Please provide a valid email address.",
+      backgroundColor: Customcolors.red,
+      colorText: Customcolors.white,
     );
+    return;
   }
+
+  await _makePostRequest(
+    endpoint: 'login',
+    body: {"email": email, "password": password},
+    onSuccess: (responseData) async {
+      await saveLoginResponse(responseData);
+
+      // Ensure token is saved properly
+      var token = responseData['token'];
+      if (token == null || token.isEmpty) {
+        Get.snackbar("Error", "Token is null or empty",
+            backgroundColor: Customcolors.red, colorText: Customcolors.white);
+        return;
+      }
+
+      isLoggedIn.value = true; // Use .value to update RxBool
+      await fetchUser();
+      Get.snackbar("Success", "Logged in successfully!",
+          backgroundColor: Customcolors.green, colorText: Customcolors.white);
+      Get.offAllNamed('homepage');
+    },
+  );
+}
+
+
+
 
   Future<void> verifyEmail(String email, String otp) async {
     await _makePostRequest(
@@ -95,70 +109,74 @@ class AuthController extends GetxController {
         Get.snackbar("Success", "Email verified successfully!",
             backgroundColor: Customcolors.green, colorText: Customcolors.white);
         Get.offAllNamed('login');
+        isLoggedIn == true;
+        await fetchUser();
       },
     );
   }
 
-Future<void> fetchUser() async {
-  try {
-    if (token.value.isEmpty) {
-      print('Error: Token is null or empty');
-      return;
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/user'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ${token.value}',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      
-      // Extract the 'user' object from the responseData
-      final userData = responseData['user'];
-      print('User data fetched: $userData');
-await fetchLevelProgress();
-      // Ensure userData is valid before assigning it
-      if (userData != null && userData is Map<String, dynamic>) {
-        userDetails.value = User.fromJson(userData); // Parse user object to User model
-        print('User details set successfully: ${userDetails.value}');
-      } else {
-        print('Error: User data is null or not in expected format');
+  Future<void> fetchUser() async {
+    try {
+      if (token.value.isEmpty) {
+        print('Error: Token is null or empty');
+        return;
       }
-    } else {
-      print('Failed to fetch user details: ${response.statusCode}');
-      print('Response body: ${response.body}');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/user'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${token.value}',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        // Extract the 'user' object from the responseData
+        final userData = responseData['user'];
+        print('User data fetched: $userData');
+        // Ensure userData is valid before assigning it
+        if (userData != null && userData is Map<String, dynamic>) {
+          userDetails.value =
+              User.fromJson(userData); // Parse user object to User model
+          print('User details set successfully: ${userDetails.value}');
+        } else {
+          print('Error: User data is null or not in expected format');
+        }
+      } else {
+        print('Failed to fetch user details: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print('Error occurred while fetching user details: $e');
     }
-  } catch (e) {
-    print('Error occurred while fetching user details: $e');
   }
-}
 
 Future<void> fetchLevelProgress() async {
-  if (userDetails.value == null) {
-    print('User details are null');
+  // Only fetch if progressDetails are null
+  if (progressDetails.value != null) {
+    print('Progress details already fetched: ${progressDetails.value}');
     return;
   }
 
   final id = userDetails.value!.id;
-  final url = Uri.parse("$baseUrl/orders/data/$id/level-progress");
+  final url = Uri.parse("$baseUrl/orders/$id/level-progress");
 
   try {
     final response = await http.get(url);
 
-    print('$baseUrl/orders/data/$id/level-progress');
-    print(progressDetails.value);
+    print('Fetching level progress from: $url');
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');  // Log the full response body
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-      
-      // Update the reactive progressDetails variable
+
+      print('Decoded data: $data');
+
       progressDetails.value = LevelProgress.fromJson(data);
       print("Progress details fetched: ${progressDetails.value}");
-      
     } else {
       print("Failed to load data: ${response.statusCode}");
     }
@@ -178,41 +196,50 @@ Future<void> fetchLevelProgress() async {
   }
 
   Future<void> checkLoginStatus() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  token.value = prefs.getString("token") ?? '';
-  isLoggedIn.value = token.value.isNotEmpty;
-  
-  print("Token: ${token.value}");
-  print("Is Logged In: ${isLoggedIn.value}");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token.value = prefs.getString("token") ?? '';
+    isLoggedIn.value = token.value.isNotEmpty;
 
-  if (isLoggedIn.value) {
-    await fetchUser(); // Fetch user details if logged in
+    print("Token: ${token.value}");
+    print("Is Logged In: ${isLoggedIn.value}");
+
+    if (isLoggedIn.value) {
+      await fetchUser(); // Fetch user details if logged in
+    }
   }
+
+Future<void> saveLoginResponse(Map<String, dynamic> responseData) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  // Save the whole response for debugging
+  await prefs.setString('loginResponse', json.encode(responseData));
+
+  // Save token if it exists
+  if (responseData.containsKey('token')) {
+    await prefs.setString("token", responseData['token']);
+    print("Saved token: ${responseData['token']}");
+  } else {
+    print("Token not found in response.");
+  }
+
+  // Save user ID
+  if (responseData.containsKey('user')) {
+    await prefs.setString("userId", responseData['user']['id'].toString());
+    print("Saved user ID: ${responseData['user']['id']}");
+  } else {
+    print("User not found in response.");
+  }
+
+  // Mark user as logged in
+  await prefs.setBool('isLoggedIn', true); // Save login status
+
+  // Retrieve and log the token for debugging
+  String? savedToken = prefs.getString('token');
+  print("Retrieved token from SharedPreferences: $savedToken");
+
+  print("User data and login status saved successfully");
 }
 
-
-  Future<void> saveLoginResponse(Map<String, dynamic> responseData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Save the whole response for debugging
-    await prefs.setString('loginResponse', json.encode(responseData));
-
-    // Save token if it exists
-    if (responseData.containsKey('token')) {
-      await prefs.setString("token", responseData['token']);
-    }
-
-    // Save user ID
-    if (responseData.containsKey('user')) {
-      await prefs.setString("userId", responseData['user']['id'].toString());
-    }
-
-    // Mark user as logged in
-    await prefs.setBool('isLoggedIn', true); // Save login status
-
-    // Print for debugging
-    print("User data and login status saved successfully");
-  }
 
   // Future<String?> _getUserIdFromPrefs() async {
   //   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -259,27 +286,38 @@ Future<void> fetchLevelProgress() async {
     }
   }
 
-  Future<Map<String, dynamic>?> getSavedUserDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedResponse = prefs.getString('loginResponse');
+Future<Map<String, dynamic>?> getSavedUserDetails() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? savedResponse = prefs.getString('loginResponse');
 
-    if (savedResponse != null) {
-      print('Retrieved saved response: $savedResponse');
-      Map<String, dynamic> decodedUser =
-          Map<String, dynamic>.from(json.decode(savedResponse));
+  if (savedResponse != null) {
+    print('Retrieved saved response: $savedResponse');
 
-      // Assign the decoded user to the reactive map
-      user.assignAll(decodedUser[
-          'user']); // You are storing only the 'user' object inside the reactive map
-      print(
-          'Decoded user details: ${user}'); // Print to ensure it was correctly assigned
-      return decodedUser;
-    } else {
-      print('No saved response found in SharedPreferences');
+    try {
+      Map<String, dynamic> decodedResponse = Map<String, dynamic>.from(json.decode(savedResponse));
+
+      // Check if 'user' key exists in the decoded response
+      if (decodedResponse.containsKey('user')) {
+        Map<String, dynamic> decodedUser = decodedResponse['user'];
+
+        // Assign the decoded user to the reactive map
+        user.assignAll(decodedUser);
+        print('Decoded user details: $decodedUser');
+
+        return decodedResponse;
+      } else {
+        print("'user' key not found in the saved response.");
+      }
+    } catch (e) {
+      print('Error decoding saved response: $e');
     }
-
-    return null;
+  } else {
+    print('No saved response found in SharedPreferences');
   }
+
+  return null;
+}
+
 
 // Example of displaying user details
   Future<void> displayUserData() async {
@@ -294,4 +332,37 @@ Future<void> fetchLevelProgress() async {
       print('No user data found');
     }
   }
+
+Future<WasteItem> getWasteItemDetails() async {
+  final url = Uri.parse("$baseUrl/waste-items");
+
+  try {
+    final response = await http.get(url);
+
+    print('Fetching waste item from: $url');
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      print('Decoded data: $data');
+
+      // Update the wasteDetails only with the first waste item, assuming the response has an array
+      final wasteItemData = (data['waste_items'] as List).first;
+      wasteDetails.value = WasteItem.fromJson(wasteItemData);
+
+      print("Waste item fetched: ${wasteDetails.value}");
+      return wasteDetails.value!;  // Always return the fetched WasteItem
+    } else {
+      throw Exception("Failed to load data: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error fetching waste item data: $e");
+    throw Exception("Error fetching waste item data: $e");
+  }
+}
+
+
+
 }

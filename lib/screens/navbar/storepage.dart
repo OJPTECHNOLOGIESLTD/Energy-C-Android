@@ -22,6 +22,7 @@ Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
     final response = await http.get(url).timeout(Duration(seconds: 10));
 
     if (response.statusCode == 200) {
+      print('items${response.body}');
       if (response.headers['content-type']?.contains('application/json') ?? false) {
         List<dynamic> data = json.decode(response.body);
         return data.map((item) => RecycleEssentials.fromJson(item)).toList();

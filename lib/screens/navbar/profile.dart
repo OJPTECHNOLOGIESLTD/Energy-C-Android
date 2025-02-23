@@ -53,12 +53,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 10),
                 Obx(() {
                             // Check if the user is logged in and display user details
-                            if (userController.userDetails.value == null) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                                child: ShimmerEffects(height: 0.05),
-                              );
-                              }
+                            if (userController.userDetails.value != null&& userController.progressDetails.value != null) {
                               final userDetails = userController.userDetails.value!;
                               final progressDetails=userController.progressDetails.value!;
                                   return Column(
@@ -76,6 +71,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                     )
                                     ],
                                   );
+                              }
+                              
+                                  return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: ShimmerEffects(height: 0.05),
+                              );
                           }),
                 const SizedBox(height: 10),
                 ElevatedButton(

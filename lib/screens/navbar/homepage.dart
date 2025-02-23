@@ -1,4 +1,5 @@
 import 'package:energy_chleen/data/api_service.dart';
+import 'package:energy_chleen/data/auth_controller.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/cards/news_and_event_card.dart';
 import 'package:energy_chleen/screens/cards/profile_card_info.dart';
@@ -43,6 +44,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final HomeController homeController =
       Get.put(HomeController()); // Initialize controller
+
+  final authController = Get.find<AuthController>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user data if the user is already logged in
+    if (authController.isLoggedIn.value) {
+      authController.fetchLevelProgress();
+      authController.getWasteItemDetails();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

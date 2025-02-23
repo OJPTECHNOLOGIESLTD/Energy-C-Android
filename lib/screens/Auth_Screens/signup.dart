@@ -1,5 +1,7 @@
 import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/screens/Auth_Screens/login.dart';
 import 'package:energy_chleen/utils/Helper.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -34,39 +36,37 @@ class _SignupState extends State<Signup> {
   }
 
   bool _validateForm() {
-  if (_firstNameController.text.isEmpty) {
-    Get.snackbar("Error", "First name is required");
-    return false;
+    if (_firstNameController.text.isEmpty) {
+      Get.snackbar("Error", "First name is required");
+      return false;
+    }
+    if (_lastNameController.text.isEmpty) {
+      Get.snackbar("Error", "Last name is required");
+      return false;
+    }
+    if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
+      Get.snackbar("Error", "Please enter a valid email");
+      return false;
+    }
+    if (_phoneController.text.isEmpty) {
+      Get.snackbar("Error", "Phone number is required");
+      return false;
+    }
+    if (_passwordController.text.isEmpty) {
+      Get.snackbar("Error", "Password is required");
+      return false;
+    }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      Get.snackbar("Error", "Passwords do not match");
+      return false;
+    }
+    if (isChecked == false) {
+      Get.snackbar(
+          "Error", "Please Accept our Private policy and terms or Use");
+      return false;
+    }
+    return true;
   }
-  if (_lastNameController.text.isEmpty) {
-    Get.snackbar("Error", "Last name is required");
-    return false;
-  }
-  if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
-    Get.snackbar("Error", "Please enter a valid email");
-    return false;
-  }
-  if (_phoneController.text.isEmpty) {
-    Get.snackbar("Error", "Phone number is required");
-    return false;
-  }
-  if (_passwordController.text.isEmpty) {
-    Get.snackbar("Error", "Password is required");
-    return false;
-  }
-  if (_passwordController.text != _confirmPasswordController.text) {
-    Get.snackbar("Error", "Passwords do not match");
-    return false;
-  }
-  if (isChecked==false){
-    Get.snackbar("Error", "Please Accept our Private policy and terms or Use");
-    return false;
-  }
-  return true;
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +182,6 @@ class _SignupState extends State<Signup> {
                       topTitle: 'Create Password',
                       hintText: 'Password',
                       isPasswordField: true,
-                      
                     ),
                     ReuseableTextformfield(
                       controller: _confirmPasswordController,
@@ -252,15 +251,17 @@ class _SignupState extends State<Signup> {
                         ),
                       ),
                       onPressed: () {
-                        if ( _validateForm()) {
-                          showOtpDialog(context, email: _emailController.text.trim());
-                        AuthController.instance.register(
-  _firstNameController.text.trim(),
-  _lastNameController.text.trim(),
-  _emailController.text.trim(), // Ensure email is passed in the correct position
-  _passwordController.text.trim(),
-  _confirmPasswordController.text.trim(),
-  _phoneController.text.trim());
+                        if (_validateForm()) {
+                          showOtpDialog(context,
+                              email: _emailController.text.trim());
+                          AuthController.instance.register(
+                              _firstNameController.text.trim(),
+                              _lastNameController.text.trim(),
+                              _emailController.text
+                                  .trim(), // Ensure email is passed in the correct position
+                              _passwordController.text.trim(),
+                              _confirmPasswordController.text.trim(),
+                              _phoneController.text.trim());
                         }
                         print("Sign up now!");
                       },
@@ -274,6 +275,34 @@ class _SignupState extends State<Signup> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 40),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text: 'Already have an account? ',
+                        style: TextStyle(color: Customcolors.white),
+                        children: [
+                          TextSpan(
+                            text: 'login',
+                            style: TextStyle(
+                                color: Customcolors.yellow,
+                                fontWeight: FontWeight.bold),
+                            // You can add a gesture recognizer to handle taps on the Privacy Policy
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // Handle tap on Terms of Use
+                                print('sign up');
+                                // Navigate sign up page, etc.
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Login()),
+                                );
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                   ],
                 ),
@@ -284,6 +313,7 @@ class _SignupState extends State<Signup> {
       ),
     );
   }
+
   void showOtpDialog(
     BuildContext context, {
     required String email, // Make email required since you are using it
@@ -344,7 +374,7 @@ class _SignupState extends State<Signup> {
                     email, // No need for a bang (!) operator
                     otp,
                   );
-                 
+
                   Navigator.of(context).pop(); // Close the dialog
                 } else {
                   Get.snackbar(
@@ -366,10 +396,6 @@ class _SignupState extends State<Signup> {
       },
     );
   }
-
-
-
-
 
   // Widget _buildProfileImagePopup(BuildContext context) {
   //   return Dialog(

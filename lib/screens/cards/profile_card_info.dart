@@ -4,7 +4,6 @@ import 'package:energy_chleen/screens/recycle_report.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shimmer/shimmer.dart';
 
 class ProfileCardInfo extends StatefulWidget {
   const ProfileCardInfo({super.key, required String profileInfo});
@@ -17,23 +16,12 @@ class _ProfileCardInfoState extends State<ProfileCardInfo> {
   final userController = Get.find<AuthController>();
 
   @override
-  void initState() {
-    super.initState();
-    // Fetch user data if the user is already logged in
-    if (userController.isLoggedIn.value) {
-      userController.fetchUser();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (userController.userDetails.value == null) {
-        return ShimmerEffects(height: 0.2);
-      }
-      final user = userController.userDetails.value!;
+      if (userController.userDetails.value != null && userController.progressDetails.value != null) {
+        final user = userController.userDetails.value!;
       final userpoints = userController.progressDetails.value!;
-      return Container(
+        return Container(
         width: MediaQuery.of(context).size.width,
         child: Card(
           shape:
@@ -118,6 +106,9 @@ class _ProfileCardInfoState extends State<ProfileCardInfo> {
           ),
         ),
       );
+      }
+      
+      return ShimmerEffects(height: 0.2);
     });
   }
 

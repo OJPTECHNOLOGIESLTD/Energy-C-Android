@@ -137,7 +137,7 @@ class _MyPointsPageState extends State<MyPointsPage> {
                 SizedBox(height: 24),
                 // Circular Progress Indicator for Level
                 Obx(() {
-                  if (authController.userDetails.value == null) {
+                  if (authController.userDetails.value == null && authController.progressDetails.value != null) {
                     return ShimmerEffects(height: 0.15);
                   }
                   final user = authController.progressDetails.value!;

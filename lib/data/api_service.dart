@@ -61,6 +61,8 @@ Future<List<NewsEvent>> fetchNewsEvents() async {
       throw Exception('Failed to load news/events. Status code: ${response.statusCode}');
     }
   } catch (e) {
+    // Get.snackbar("Success", "Email verified successfully!",
+    //         backgroundColor: Customcolors.green, colorText: Customcolors.white);
     throw Exception('Error fetching news/events: $e');
   }
  }

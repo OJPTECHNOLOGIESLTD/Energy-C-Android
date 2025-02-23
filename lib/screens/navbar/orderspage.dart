@@ -1,7 +1,47 @@
+import 'dart:convert';
+
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 
 class OrdersPage extends StatelessWidget {
+  final String baseUrl = "https://backend.energychleen.ng/api";
+
+Future<List<Order>> fetchOrders() async {
+  try {
+    final url = Uri.parse('$baseUrl/orders');
+    print('Requesting: $url');
+
+    final response = await http.get(url).timeout(Duration(seconds: 10));
+
+    if (response.statusCode == 200) {
+      print('items${response.body}');
+
+      if (response.headers['content-type']?.contains('application/json') ?? false) {
+        // Parse the response body as a Map
+        Map<String, dynamic> data = json.decode(response.body);
+
+        // Access the 'orders' list from the response
+        List<dynamic> ordersJson = data['orders'];
+
+        // Map the orders list to Order objects
+        return ordersJson.map((orderJson) => Order.fromJson(orderJson)).toList();
+      } else {
+        throw Exception('Invalid response format. Expected JSON.');
+      }
+    } else if (response.statusCode == 404) {
+      throw Exception('Endpoint not found. Check the URL.');
+    } else {
+      throw Exception('Failed to load orders. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+    throw Exception('Error fetching orders: $e');
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -56,23 +96,36 @@ class OrdersPage extends StatelessWidget {
               ),
               SizedBox(height: 16),
               
-              // Order list
-              Expanded(
+              FutureBuilder<List<Order>>(
+              future: fetchOrders(),
+              // ApiService.instance.fetchRecycleEssentials(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return ShimmerEffects(height: 0.5);
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('You Have no orders.'));
+                } else {
+              return Expanded(
                 child: ListView.builder(
-                  itemCount: 4,
-                  itemBuilder: (BuildContext context, int index) {
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    final order = snapshot.data![index];
                return  OrderCard(
-                      materialType: 'Plastic',
-                      orderId: 'ENC - 100201',
-                      status: 'Pending Approval',
-                      estWeight: '3kg',
-                      estIncome: 'NGN 3,700',
-                      pickUpDate: 'Flexible',
-                      address: '28 Limca Road, Awada, Onitsha',
+                      materialType: order.address,
+                      orderId: order.orderId,
+                      status: order.status,
+                      quantity: order.totalWeight,
+                      estIncome: order.totalPrice,
+                      pickUpDate: order.date,
+                      address: order.address, cityName: order.cityName, stateName: order.stateName,
                     ); },
 
                 ),
-              ),
+              );
+              
+              }}),
             ],
           ),
         ),
@@ -113,19 +166,21 @@ class OrderCard extends StatelessWidget {
   final String materialType;
   final String orderId;
   final String status;
-  final String estWeight;
-  final String estIncome;
+  final double quantity;
+  final double estIncome;
   final String pickUpDate;
   final String address;
+    final String cityName;
+  final String stateName;
 
   const OrderCard({
     required this.materialType,
     required this.orderId,
     required this.status,
-    required this.estWeight,
+    required this.quantity,
     required this.estIncome,
     required this.pickUpDate,
-    required this.address,
+    required this.address, required this.cityName, required this.stateName,
   });
 
   @override
@@ -153,13 +208,21 @@ class OrderCard extends StatelessWidget {
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(orderId, style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(orderId.toString(), style: TextStyle(fontWeight: FontWeight.bold)),
                                 
             // Status
             Text(
-              status,
-              style: TextStyle(color: status == 'Approved' ? Colors.green : Colors.orange),
-            ),
+  status,
+  style: TextStyle(
+    color: status == 'Approved' 
+        ? Colors.green 
+        : status == 'Pending' 
+            ? Colors.orange 
+            : status == 'Cancelled' 
+                ? Colors.red 
+                : Colors.black, // Default color if none match
+  ),
+),
                   ],
                 ),
               ],
@@ -176,7 +239,7 @@ class OrderCard extends StatelessWidget {
                     children: [
                       Text('Est. Weight:',
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text(estWeight,
+                       Text(quantity.toString(),
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
                     ],
                   ),
@@ -185,7 +248,7 @@ class OrderCard extends StatelessWidget {
                     children: [
                       Text('Est. Income:',
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text(estIncome,
+                       Text(estIncome.toString(),
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
                     ],
                   ),
@@ -194,7 +257,7 @@ class OrderCard extends StatelessWidget {
                     children: [
                       Text('Pickup Date:',
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text('31 Feb 2025 😂',
+                       Text(pickUpDate,
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
                     ],
                   ),            
@@ -204,7 +267,7 @@ class OrderCard extends StatelessWidget {
                     children: [
                       Text('Pickup Address:',
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text('20 Nnamdi Kanu Way Nnewi',
+                       Text('${address} ${cityName} ${stateName}',
                       style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
                     ],
                   ),
