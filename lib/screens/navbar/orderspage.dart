@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:energy_chleen/data/auth_controller.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,9 @@ import 'package:http/http.dart' as http;
 class OrdersPage extends StatelessWidget {
   final String baseUrl = "https://backend.energychleen.ng/api";
 
-Future<List<Order>> fetchOrders() async {
+Future<List<FetchOrderDetails>> fetchOrders() async {
   try {
-    final url = Uri.parse('$baseUrl/orders');
+    final url = Uri.parse('$baseUrl/orders/all/${AuthController.instance.userDetails.value!.id}');
     print('Requesting: $url');
 
     final response = await http.get(url).timeout(Duration(seconds: 10));
@@ -27,7 +28,7 @@ Future<List<Order>> fetchOrders() async {
         List<dynamic> ordersJson = data['orders'];
 
         // Map the orders list to Order objects
-        return ordersJson.map((orderJson) => Order.fromJson(orderJson)).toList();
+        return ordersJson.map((orderJson) => FetchOrderDetails.fromJson(orderJson)).toList();
       } else {
         throw Exception('Invalid response format. Expected JSON.');
       }
@@ -96,7 +97,7 @@ Future<List<Order>> fetchOrders() async {
               ),
               SizedBox(height: 16),
               
-              FutureBuilder<List<Order>>(
+              FutureBuilder<List<FetchOrderDetails>>(
               future: fetchOrders(),
               // ApiService.instance.fetchRecycleEssentials(),
               builder: (context, snapshot) {

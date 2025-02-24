@@ -13,7 +13,7 @@ class ApiService extends GetxService  {
     fetchNewsEvents();
   }
  // Method to fetch order details by ID
-  Future<Order?> getOrderDetails(String orderId) async {
+  Future<FetchOrderDetails?> getOrderDetails(String orderId) async {
     final String url = '$baseUrl/$orderId';
 
     try {
@@ -22,7 +22,7 @@ class ApiService extends GetxService  {
       if (response.statusCode == 200) {
         // Parse the JSON response and return the Order object
         final Map<String, dynamic> data = json.decode(response.body);
-        return Order.fromJson(data);
+        return FetchOrderDetails.fromJson(data);
       } else {
         // Handle non-200 responses
         print('Failed to load order details: ${response.statusCode}');

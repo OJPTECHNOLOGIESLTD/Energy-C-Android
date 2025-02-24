@@ -161,7 +161,7 @@ Future<void> fetchLevelProgress() async {
   }
 
   // final id = userDetails.value!.id;
-  final url = Uri.parse("$baseUrl/orders/${userDetails.value?.id}/level-progress");
+  final url = Uri.parse("$baseUrl/${userDetails.value?.id}/level-progress");
 
   try {
     final response = await http.get(url);
@@ -240,11 +240,6 @@ Future<void> saveLoginResponse(Map<String, dynamic> responseData) async {
   print("User data and login status saved successfully");
 }
 
-
-  // Future<String?> _getUserIdFromPrefs() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   return prefs.getString('userId');
-  // }
 
   Future<void> _makePostRequest({
     required String endpoint,

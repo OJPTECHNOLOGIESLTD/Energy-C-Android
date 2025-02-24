@@ -153,7 +153,7 @@ class Instruction {
 }
 
 
-class Order {
+class FetchOrderDetails {
   final String orderId;
   final String status;
   final double totalWeight;
@@ -163,7 +163,7 @@ class Order {
   final int cityName;
   final int stateName;
 
-  Order({
+  FetchOrderDetails({
     required this.orderId,
     required this.status,
     required this.totalWeight,
@@ -175,8 +175,8 @@ class Order {
   });
 
   // Factory method to create an Order object from JSON
-  factory Order.fromJson(Map<String, dynamic> json) {
-    return Order(
+  factory FetchOrderDetails.fromJson(Map<String, dynamic> json) {
+    return FetchOrderDetails(
       orderId: json['orderId'],
       status: json['status'],
       totalWeight: double.parse(json['totalWeight']),
@@ -188,44 +188,41 @@ class Order {
     );
   }
 }
+class StartPlacingOrders {
+  final String orderId;
+  final String status;
+  final double totalWeight;
+  final double totalPrice;
+  final String date;
+  final String address;
+  final int cityName;
+  final int stateName;
 
+  StartPlacingOrders({
+    required this.orderId,
+    required this.status,
+    required this.totalWeight,
+    required this.totalPrice,
+    required this.date,
+    required this.address,
+    required this.cityName,
+    required this.stateName,
+  });
 
-// class LevelProgress {
-//   final String currentLevel;
-//   final int totalPoints;
-//   final String nextLevel;
-//   final int pointsRequired;
-
-//   LevelProgress({
-//     required this.currentLevel,
-//     required this.totalPoints,
-//     required this.nextLevel,
-//     required this.pointsRequired,
-//   });
-
-//   factory LevelProgress.fromJson(Map<String, dynamic> json) {
-//     return LevelProgress(
-//       currentLevel: json['currentLevel'] != null ? json['currentLevel'] as String : 'Unknown',
-//       totalPoints: json['totalPoints'] != null ? json['totalPoints'] as int : 0,
-//       nextLevel: json['nextLevel'] != null ? json['nextLevel'] as String : 'Unknown',
-//       pointsRequired: json['pointsRequired'] != null ? json['pointsRequired'] as int : 0,
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'currentLevel': currentLevel,
-//       'totalPoints': totalPoints,
-//       'nextLevel': nextLevel,
-//       'pointsRequired': pointsRequired,
-//     };
-//   }
-
-//   @override
-//   String toString() {
-//     return 'LevelProgress(currentLevel: $currentLevel, totalPoints: $totalPoints, nextLevel: $nextLevel, pointsRequired: $pointsRequired)';
-//   }
-// }
+  // Factory method to create an Order object from JSON
+  factory StartPlacingOrders.fromJson(Map<String, dynamic> json) {
+    return StartPlacingOrders(
+      orderId: json['orderId'],
+      status: json['status'],
+      totalWeight: double.parse(json['totalWeight']),
+      totalPrice: double.parse(json['totalPrice']),
+      date: json['date'],
+      address: json['address'],
+      cityName: json['cityId'],
+      stateName: json['stateId'],
+    );
+  }
+}
 
 class LevelProgress {
   final String currentLevel;

@@ -19,19 +19,35 @@ class RecyclingPage extends StatefulWidget {
 }
 
 class _RecyclingPageState extends State<RecyclingPage> {
-  int weight = 3;
-  int pricePerKg = 1250; // TODO: Get from backend
 
   final StorageService storageService = StorageService();
 
   // Save in shared preference
   Future<void> _saveScheduleData() async {
+    
+      final authController = Get.find<AuthController>();
+      if (authController.wasteDetails.value == null) {
+         Get.snackbar(
+        "Error",
+        "Details not updated.",
+        backgroundColor: Customcolors.red,
+        colorText: Customcolors.white,
+      );
+      return; // Display '0' if wasteDetails is null
+    }
+    final wasteDetails = authController.wasteDetails.value!;
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('wasteType', widget.wasteType);
-    await prefs.setInt('weight', weight);
-    await prefs.setInt('estPrice', weight * pricePerKg);
+    await prefs.setString('wasteType', wasteDetails.name);
+    await prefs.setInt('weight', wasteDetails.weight);
+    await prefs.setInt('estPrice', wasteDetails.weight  * wasteDetails.price.toInt());
+     Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                PickUpDetailsPage()),
+                                      );
     print(
-        'waste ${widget.wasteType}, weight ${weight}, est. price ${weight * pricePerKg} ');
+        'waste ${wasteDetails.name}, weight ${wasteDetails.weight}, est. price ${wasteDetails.weight * wasteDetails.price} ');
   }
 
   @override
@@ -153,7 +169,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
                                               BorderRadius.circular(8),
                                         ),
                                         child: Text(
-                                          'NGN ${weight * wasteDetails.price}',
+                                          'NGN ${wasteDetails.weight * wasteDetails.price}',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -179,12 +195,6 @@ class _RecyclingPageState extends State<RecyclingPage> {
                                     ),
                                     onPressed: () async {
                                       await _saveScheduleData();
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PickUpDetailsPage()),
-                                      );
                                     },
                                     child: Text('Schedule',
                                         style: TextStyle(
