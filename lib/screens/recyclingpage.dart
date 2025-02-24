@@ -238,17 +238,24 @@ class _RecyclingPageState extends State<RecyclingPage> {
     );
   }
 
-  Widget _buildWeightSelector() {
+Widget _buildWeightSelector() {
+  final authController = Get.find<AuthController>();
+  
+  return Obx(() {
+    if (authController.wasteDetails.value == null) {
+      return Text('0'); // Display '0' if wasteDetails is null
+    }
+    
+    final wasteDetails = authController.wasteDetails.value!;
+    
     return Row(
       children: [
         // Minus Button
         GestureDetector(
           onTap: () {
-            setState(() {
-              if (weight > 1) {
-                weight--;
-              }
-            });
+            if (wasteDetails.weight > 1) {
+              authController.updateWasteWeight(wasteDetails.weight - 1);
+            }
           },
           child: Container(
             padding: EdgeInsets.all(8),
@@ -260,18 +267,16 @@ class _RecyclingPageState extends State<RecyclingPage> {
           ),
         ),
         SizedBox(width: 16),
-
+        
         // Weight Display
-        Text('$weight',
+        Text('${wasteDetails.weight}',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         SizedBox(width: 16),
-
+        
         // Plus Button
         GestureDetector(
           onTap: () {
-            setState(() {
-              weight++;
-            });
+            authController.updateWasteWeight(wasteDetails.weight + 1);
           },
           child: Container(
             padding: EdgeInsets.all(8),
@@ -284,5 +289,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
         ),
       ],
     );
-  }
+  });
+}
+
 }

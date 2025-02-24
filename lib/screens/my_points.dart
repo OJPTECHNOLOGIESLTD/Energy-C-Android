@@ -163,12 +163,12 @@ class _MyPointsPageState extends State<MyPointsPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              'LEVEL ${user.currentLevel}',
+                              'LEVEL',
                               textAlign: TextAlign.center,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              userpoint.level,
+                              user.currentLevel,
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold),
                             )
@@ -190,7 +190,8 @@ class _MyPointsPageState extends State<MyPointsPage> {
                     final userpoint = authController.userDetails.value!;
                     return Center(
                   child:  Text(
-                      '${userpoint.points}/${user.nextLevelPoints.toString()} Recycle Needed For The Next Level',
+                    textAlign: TextAlign.center,
+                      '${userpoint.points}/${user.nextLevelPoints.toString()} Recycle Needed For The Next Level\nNext Level: ${user.nextLevel}',
                       style: TextStyle(fontSize: 16, color: Colors.black),
                     ),
                 ); }),

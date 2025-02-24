@@ -170,8 +170,8 @@ class OrderCard extends StatelessWidget {
   final double estIncome;
   final String pickUpDate;
   final String address;
-    final String cityName;
-  final String stateName;
+    final int cityName;
+  final int stateName;
 
   const OrderCard({
     required this.materialType,

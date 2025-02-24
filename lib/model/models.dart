@@ -56,7 +56,7 @@ class User {
   final String lastName;
   final String email;
   final String phoneNumber;
-  final int wasteWeight;
+  final double? wasteWeight;
   final int points;
   final String level;
   final bool isVerified;
@@ -87,7 +87,7 @@ class User {
       lastName: json['lastName'],
       email: json['email'],
       phoneNumber: json['phoneNumber']?.toString() ?? '',
-      wasteWeight: json['wasteWeight'],
+      wasteWeight: json['wasteWeight'] != null ? json['wasteWeight'].toDouble() : null,
       points: json['points'],
       level: json['level'],
       isVerified: json['isVerified'] == 1,
@@ -101,7 +101,7 @@ class User {
 class WasteItem {
   final String name;
   final String? category;  // Allow category to be nullable
-  final double weight;
+  int weight;
   final double price;
   final String image;
   final String video;
@@ -123,7 +123,7 @@ class WasteItem {
     return WasteItem(
       name: json['name'] ?? 'Unknown',  // Fallback if name is null
       category: json['category'],       // This can be null
-      weight: (json['weight'] as num?)?.toDouble() ?? 0.0,  // Handle potential null
+      weight: json['weight'],  // Handle potential null
       price: (json['price'] as num?)?.toDouble() ?? 0.0,    // Handle potential null
       image: json['image'] ?? '',      // Provide fallback if null
       video: json['video'] ?? '',      // Provide fallback if null
@@ -160,8 +160,8 @@ class Order {
   final double totalPrice;
   final String date;
   final String address;
-  final String cityName;
-  final String stateName;
+  final int cityName;
+  final int stateName;
 
   Order({
     required this.orderId,
@@ -183,8 +183,8 @@ class Order {
       totalPrice: double.parse(json['totalPrice']),
       date: json['date'],
       address: json['address'],
-      cityName: json['cityId']['cityName'],
-      stateName: json['stateId']['stateName'],
+      cityName: json['cityId'],
+      stateName: json['stateId'],
     );
   }
 }
@@ -228,12 +228,14 @@ class Order {
 // }
 
 class LevelProgress {
-  final int currentLevel;
+  final String currentLevel;
+  final String nextLevel;
   final int nextLevelPoints;
   final int progressPercentage;
 
-  LevelProgress({
+  LevelProgress( {
     required this.currentLevel,
+    required this.nextLevel,
     required this.nextLevelPoints,
     required this.progressPercentage,
   });
@@ -241,6 +243,7 @@ class LevelProgress {
   factory LevelProgress.fromJson(Map<String, dynamic> json) {
     return LevelProgress(
       currentLevel: json['current_level'],
+      nextLevel: json['next_level'],
       nextLevelPoints: json['next_level_points'],
       progressPercentage: json['progress_percentage'],
     );
@@ -249,6 +252,7 @@ class LevelProgress {
   Map<String, dynamic> toJson() {
     return {
       'current_level': currentLevel,
+      'next_level': nextLevel,
       'next_level_points': nextLevelPoints,
       'progress_percentage': progressPercentage,
     };
@@ -256,7 +260,7 @@ class LevelProgress {
 
   @override
   String toString() {
-    return 'LevelProgress(currentLevel: $currentLevel, nextLevelPoints: $nextLevelPoints, progressPercentage: $progressPercentage)';
+    return 'LevelProgress(currentLevel: $currentLevel,nextLevel: $nextLevel, nextLevelPoints: $nextLevelPoints, progressPercentage: $progressPercentage)';
   }
 }
 class PurchaseModel {

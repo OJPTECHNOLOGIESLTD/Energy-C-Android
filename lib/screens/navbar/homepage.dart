@@ -59,6 +59,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    AuthController.instance.checkLoginStatus();
     return Scaffold(
       appBar: CustomAppBar(),
       body: DecoratedBox(

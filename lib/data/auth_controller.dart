@@ -160,8 +160,8 @@ Future<void> fetchLevelProgress() async {
     return;
   }
 
-  final id = userDetails.value!.id;
-  final url = Uri.parse("$baseUrl/orders/$id/level-progress");
+  // final id = userDetails.value!.id;
+  final url = Uri.parse("$baseUrl/orders/${userDetails.value?.id}/level-progress");
 
   try {
     final response = await http.get(url);
@@ -363,6 +363,12 @@ Future<WasteItem> getWasteItemDetails() async {
   }
 }
 
-
-
+  void updateWasteWeight(int newWeight) {
+    wasteDetails.update((val) {
+      if (val != null) {
+        val.weight = newWeight;
+      }
+    });
+  }
 }
+

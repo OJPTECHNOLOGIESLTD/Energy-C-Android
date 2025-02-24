@@ -55,7 +55,7 @@ class _ProfileCardInfoState extends State<ProfileCardInfo> {
                             ),
                           ),
                           Text(
-                            'Level ${userpoints.currentLevel}: ${user.level}',
+                            'Level ${userpoints.currentLevel}',//: ${user.level}
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.7),

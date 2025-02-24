@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       fontSize: 18),
                                         ),
                                         Text(
-                                      'Level ${progressDetails.currentLevel} ${userDetails.level}',
+                                      'Level ${progressDetails.currentLevel}',// ${userDetails.level}
                                        style: TextStyle(fontSize: 16, color: Colors.grey.shade800),
                                     )
                                     ],
