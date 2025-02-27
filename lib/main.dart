@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'package:energy_chleen/data/api_service.dart';
+import 'package:energy_chleen/data/controllers/api_service.dart';
+import 'package:energy_chleen/data/controllers/orders_controller.dart';
 import 'package:energy_chleen/screens/Auth_Screens/login.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
 import 'package:energy_chleen/screens/navbar/navbar.dart';
 import 'package:energy_chleen/screens/onboarding_screen/onboarding.dart';
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,7 @@ void main() {
   runApp(const MyApp());
   Get.put(AuthController()); // injecting authcontroller
   Get.lazyPut(()=>ApiService()); //or Get.lazyPut(()=>ApiService());
+  Get.lazyPut(()=>OrdersController());
   }
 
 class MyApp extends StatelessWidget {

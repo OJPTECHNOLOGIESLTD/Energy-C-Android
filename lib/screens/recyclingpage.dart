@@ -1,11 +1,11 @@
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/pickup_details.dart';
 import 'package:energy_chleen/screens/request_summary.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RecyclingPage extends StatefulWidget {
   final bool actionType1;
@@ -19,36 +19,41 @@ class RecyclingPage extends StatefulWidget {
 }
 
 class _RecyclingPageState extends State<RecyclingPage> {
-
   final StorageService storageService = StorageService();
+  CityName? selectedCity;  // Variable to hold selected city
+  StateData? selectedState;
 
   // Save in shared preference
   Future<void> _saveScheduleData() async {
-    
-      final authController = Get.find<AuthController>();
-      if (authController.wasteDetails.value == null) {
-         Get.snackbar(
+    final authController = Get.find<AuthController>();
+
+    if (authController.wasteDetails.value == null) {
+      Get.snackbar(
         "Error",
         "Details not updated.",
         backgroundColor: Customcolors.red,
         colorText: Customcolors.white,
       );
-      return; // Display '0' if wasteDetails is null
+      return;
     }
+
     final wasteDetails = authController.wasteDetails.value!;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('wasteType', wasteDetails.name);
-    await prefs.setInt('weight', wasteDetails.weight);
-    await prefs.setInt('estPrice', wasteDetails.weight  * wasteDetails.price.toInt());
-     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PickUpDetailsPage()),
-                                      );
+await storageService.saveWasteDetails(
+  wasteType: wasteDetails.name,
+  weight: wasteDetails.weight.toInt(), // Weight in some unit
+  estPrice: wasteDetails.weight.toInt() * wasteDetails.price.toInt(), // Estimated price
+);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => PickUpDetailsPage()),
+    );
+
     print(
-        'waste ${wasteDetails.name}, weight ${wasteDetails.weight}, est. price ${wasteDetails.weight * wasteDetails.price} ');
+        'waste ${wasteDetails.name}, weight ${wasteDetails.weight}, est. price ${wasteDetails.weight * wasteDetails.price}');
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +114,7 @@ class _RecyclingPageState extends State<RecyclingPage> {
 
                               // Description
                               Text(
-                                wasteDetails.description,
+                                wasteDetails.description!,
                                 style: TextStyle(fontSize: 14),
                               ),
 
@@ -248,58 +253,58 @@ class _RecyclingPageState extends State<RecyclingPage> {
     );
   }
 
-Widget _buildWeightSelector() {
-  final authController = Get.find<AuthController>();
-  
-  return Obx(() {
-    if (authController.wasteDetails.value == null) {
-      return Text('0'); // Display '0' if wasteDetails is null
-    }
-    
-    final wasteDetails = authController.wasteDetails.value!;
-    
-    return Row(
-      children: [
-        // Minus Button
-        GestureDetector(
-          onTap: () {
-            if (wasteDetails.weight > 1) {
-              authController.updateWasteWeight(wasteDetails.weight - 1);
-            }
-          },
-          child: Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Customcolors.offwhite,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.remove),
-          ),
-        ),
-        SizedBox(width: 16),
-        
-        // Weight Display
-        Text('${wasteDetails.weight}',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        SizedBox(width: 16),
-        
-        // Plus Button
-        GestureDetector(
-          onTap: () {
-            authController.updateWasteWeight(wasteDetails.weight + 1);
-          },
-          child: Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Customcolors.offwhite,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.add),
-          ),
-        ),
-      ],
-    );
-  });
-}
+  Widget _buildWeightSelector() {
+    final authController = Get.find<AuthController>();
 
+    return Obx(() {
+      if (authController.wasteDetails.value == null) {
+        return Text('0'); // Display '0' if wasteDetails is null
+      }
+
+      final wasteDetails = authController.wasteDetails.value!;
+
+      return Row(
+        children: [
+          // Minus Button
+          GestureDetector(
+            onTap: () {
+              if (wasteDetails.weight > 1) {
+                authController
+                    .updateWasteWeight(wasteDetails.weight.toInt() - 1);
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Customcolors.offwhite,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.remove),
+            ),
+          ),
+          SizedBox(width: 16),
+
+          // Weight Display
+          Text('${wasteDetails.weight}',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(width: 16),
+
+          // Plus Button
+          GestureDetector(
+            onTap: () {
+              authController.updateWasteWeight(wasteDetails.weight.toInt() + 1);
+            },
+            child: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Customcolors.offwhite,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.add),
+            ),
+          ),
+        ],
+      );
+    });
+  }
 }

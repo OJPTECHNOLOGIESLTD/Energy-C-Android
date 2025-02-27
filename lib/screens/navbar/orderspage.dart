@@ -1,47 +1,65 @@
 import 'dart:convert';
-
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+class OrderService {
+  final String baseUrl = "https://backend.energychleen.ng/api"; // Replace with your API base URL
 
-class OrdersPage extends StatelessWidget {
-  final String baseUrl = "https://backend.energychleen.ng/api";
+Future<Map<String, dynamic>> cancelOrder(String orderId) async {
+  final url = Uri.parse("$baseUrl/cancel/$orderId");
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token')?.trim() ?? '';
 
-Future<List<FetchOrderDetails>> fetchOrders() async {
+  print("Token: Bearer $token"); // Check the full token format
+
   try {
-    final url = Uri.parse('$baseUrl/orders/all/${AuthController.instance.userDetails.value!.id}');
-    print('Requesting: $url');
+    final response = await http.post(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token", // Correctly formatted with "Bearer"
+      "Accept": "application/json",
+    }, body: jsonEncode({}));
 
-    final response = await http.get(url).timeout(Duration(seconds: 10));
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      print('items${response.body}');
-
-      if (response.headers['content-type']?.contains('application/json') ?? false) {
-        // Parse the response body as a Map
-        Map<String, dynamic> data = json.decode(response.body);
-
-        // Access the 'orders' list from the response
-        List<dynamic> ordersJson = data['orders'];
-
-        // Map the orders list to Order objects
-        return ordersJson.map((orderJson) => FetchOrderDetails.fromJson(orderJson)).toList();
-      } else {
-        throw Exception('Invalid response format. Expected JSON.');
-      }
-    } else if (response.statusCode == 404) {
-      throw Exception('Endpoint not found. Check the URL.');
+      return jsonDecode(response.body);
     } else {
-      throw Exception('Failed to load orders. Status code: ${response.statusCode}');
+      return {
+        "error": "Failed to cancel order",
+        "statusCode": response.statusCode,
+        "message": response.body
+      };
     }
   } catch (e) {
-    print('Error: $e');
-    throw Exception('Error fetching orders: $e');
+    return {"error": "An error occurred", "details": e.toString()};
   }
 }
+}
+
+class OrdersPage extends StatefulWidget {
+  @override
+  State<OrdersPage> createState() => _OrdersPageState();
+}
+
+class _OrdersPageState extends State<OrdersPage> {
+  bool approved = true;
+  bool pending = false;
+  bool cancelled = false;
+  bool completed = false;
+
+  void setActiveTab(String tabName) {
+    setState(() {
+      approved = tabName == 'Active';
+      pending = tabName == 'Pending';
+      cancelled = tabName == 'Cancelled';
+      completed = tabName == 'Completed';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,81 +70,154 @@ Future<List<FetchOrderDetails>> fetchOrders() async {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               // Tab buttons
               Container(
                 margin: EdgeInsets.only(top: 20),
                 padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                 decoration: BoxDecoration(
-                  color: Customcolors.offwhite,
-                  borderRadius: BorderRadius.circular(40)
-                ),
+                    color: Customcolors.offwhite,
+                    borderRadius: BorderRadius.circular(40)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TabButton(title: 'Active', isActive: true),
-                    TabButton(title: 'Cancelled', isActive: false),
-                    TabButton(title: 'Completed', isActive: false),
+                    TabButton(
+                      title: 'Active',
+                      isActive: approved,
+                      onTap: () {
+                        setActiveTab('Active');
+                      },
+                    ),
+                    TabButton(
+                      title: 'Pending',
+                      isActive: pending,
+                      onTap: () {
+                        setActiveTab('Pending');
+                      },
+                    ),
+                    TabButton(
+                      title: 'Cancelled',
+                      isActive: cancelled,
+                      onTap: () {
+                        setActiveTab('Cancelled');
+                      },
+                    ),
+                    TabButton(
+                      title: 'Completed',
+                      isActive: completed,
+                      onTap: () {
+                        setActiveTab('Completed');
+                      },
+                    ),
                   ],
                 ),
               ),
               SizedBox(height: 16),
-              
+
               // Search bar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width *0.85,
+                    width: MediaQuery.of(context).size.width * 0.85,
                     decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(10)
-                  ),
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(10)),
                     child: TextField(
-                      strutStyle: StrutStyle(height: 2, forceStrutHeight: true, fontStyle: FontStyle.normal),
+                      strutStyle: StrutStyle(
+                          height: 2,
+                          forceStrutHeight: true,
+                          fontStyle: FontStyle.normal),
                       decoration: InputDecoration(
                         hintText: 'Search History',
                         prefixIcon: Icon(Icons.search),
-                        enabledBorder: InputBorder.none,  // Removes the border when enabled
-                        focusedBorder: InputBorder.none, 
+                        enabledBorder:
+                            InputBorder.none, // Removes the border when enabled
+                        focusedBorder: InputBorder.none,
                       ),
                     ),
                   ),
-              Icon(Icons.filter_alt_outlined),
+                  Icon(Icons.filter_alt_outlined),
                 ],
               ),
               SizedBox(height: 16),
-              
-              FutureBuilder<List<FetchOrderDetails>>(
-              future: fetchOrders(),
-              // ApiService.instance.fetchRecycleEssentials(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return ShimmerEffects(height: 0.5);
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('You Have no orders.'));
-                } else {
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final order = snapshot.data![index];
-               return  OrderCard(
-                      materialType: order.address,
-                      orderId: order.orderId,
-                      status: order.status,
-                      quantity: order.totalWeight,
-                      estIncome: order.totalPrice,
-                      pickUpDate: order.date,
-                      address: order.address, cityName: order.cityName, stateName: order.stateName,
-                    ); },
 
-                ),
+FutureBuilder<List<Order>>(
+  future: AuthController.instance.fetchOrders(
+    AuthController.instance.userDetails.value!.id,
+  ),
+  builder: (context, snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return ShimmerEffects(height: 0.7);
+    } else if (snapshot.hasError) {
+      return Center(child: Text('Error: ${snapshot.error}'));
+    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      return Center(child: Text('Nothing to see here.',
+      style: TextStyle(color: Colors.black),));
+    } else {
+      return Expanded(
+        child: ListView.builder(
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final order = snapshot.data![index];
+
+            if (approved && order.status == 'Approved') {
+              return OrderCard(
+                materialType: order.wasteItemId.toString(),
+                orderId: order.orderId,
+                status: order.status,
+                quantity: order.totalWeight,
+                estIncome: order.totalPrice,
+                pickUpDate: order.date,
+                address: order.address,
+                cityName: order.cityId,
+                stateName: order.stateId,
               );
-              
-              }}),
+            } else if (pending && order.status == 'Pending') {
+              return OrderCard(
+                materialType: order.wasteItemId.toString(),
+                orderId: order.orderId,
+                status: order.status,
+                quantity: order.totalWeight,
+                estIncome: order.totalPrice,
+                pickUpDate: order.date,
+                address: order.address,
+                cityName: order.cityId,
+                stateName: order.stateId,
+              );
+            } else if (cancelled && order.status == 'Cancelled') {
+              return OrderCard(
+                materialType: order.wasteItemId.toString(),
+                orderId: order.orderId,
+                status: order.status,
+                quantity: order.totalWeight,
+                estIncome: order.totalPrice,
+                pickUpDate: order.date,
+                address: order.address,
+                cityName: order.cityId,
+                stateName: order.stateId,
+              );
+            }else if (completed && order.status == 'Completed') {
+              return OrderCard(
+                materialType: order.wasteItemId.toString(),
+                orderId: order.orderId,
+                status: order.status,
+                quantity: order.totalWeight,
+                estIncome: order.totalPrice,
+                pickUpDate: order.date,
+                address: order.address,
+                cityName: order.cityId,
+                stateName: order.stateId,
+              );
+            }
+
+            // If no order matches, return empty container
+            return SizedBox.shrink( );
+          },
+        ),
+      );
+    }
+  },
+),
             ],
           ),
         ),
@@ -138,24 +229,28 @@ Future<List<FetchOrderDetails>> fetchOrders() async {
 class TabButton extends StatelessWidget {
   final String title;
   final bool isActive;
+  final VoidCallback onTap;
 
-  const TabButton({required this.title, required this.isActive});
+  const TabButton({
+    required this.title,
+    required this.isActive,
+    required this.onTap,
+  });
+  
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-      decoration: BoxDecoration(
-        color: isActive ? Customcolors.teal : Colors.grey[100],
-        borderRadius: BorderRadius.circular(40)
-      ),
-      child: GestureDetector(
-        onTap:  () {
-        // Handle tab click
-      },
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isActive ? Customcolors.teal : Colors.grey[100],
+          borderRadius: BorderRadius.circular(40),
+        ),
         child: Text(
-          textAlign: TextAlign.center,
           title,
+          textAlign: TextAlign.center,
           style: TextStyle(color: isActive ? Colors.white : Colors.black),
         ),
       ),
@@ -163,7 +258,7 @@ class TabButton extends StatelessWidget {
   }
 }
 
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final String materialType;
   final String orderId;
   final String status;
@@ -171,7 +266,7 @@ class OrderCard extends StatelessWidget {
   final double estIncome;
   final String pickUpDate;
   final String address;
-    final int cityName;
+  final int cityName;
   final int stateName;
 
   const OrderCard({
@@ -181,8 +276,42 @@ class OrderCard extends StatelessWidget {
     required this.quantity,
     required this.estIncome,
     required this.pickUpDate,
-    required this.address, required this.cityName, required this.stateName,
+    required this.address,
+    required this.cityName,
+    required this.stateName,
   });
+
+  @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> {
+  bool isLoading = false;
+
+  void cancelUserOrder() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    String orderId = widget.orderId; // Example order ID
+    OrderService orderService = OrderService();
+
+    var response = await orderService.cancelOrder(orderId);
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (response.containsKey("error")) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${response['message']}")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Success: ${response['message']}")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,34 +330,41 @@ class OrderCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   decoration: BoxDecoration(
-                    color: Customcolors.teal,
-                    borderRadius: BorderRadius.circular(30)
+                      color: Customcolors.teal,
+                      borderRadius: BorderRadius.circular(30)),
+                  child: Text(
+                    widget.materialType,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: Customcolors.white),
                   ),
-                  child: Text( materialType,
-                  style: TextStyle(fontWeight: FontWeight.w500, color: Customcolors.white),),
                 ),
-                Column(crossAxisAlignment: CrossAxisAlignment.end,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(orderId.toString(), style: TextStyle(fontWeight: FontWeight.bold)),
-                                
-            // Status
-            Text(
-  status,
-  style: TextStyle(
-    color: status == 'Approved' 
-        ? Colors.green 
-        : status == 'Pending' 
-            ? Colors.orange 
-            : status == 'Cancelled' 
-                ? Colors.red 
-                : Colors.black, // Default color if none match
-  ),
-),
+                    Text(widget.orderId.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+
+                    // Status
+                    Text(
+                      widget.status,
+                      style: TextStyle(
+                        color: widget.status == 'Approved'
+                            ? Colors.green
+                            : widget.status == 'Pending'
+                                ? Colors.orange
+                                : widget.status == 'Completed'
+                                    ? Colors.green
+                                    : widget.status == 'Cancelled'
+                                        ? Colors.red
+                                        : Colors
+                                            .black, // Default color if none match
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
-            
+
             // Estimated Weight and Income
             Container(
               height: 100,
@@ -238,66 +374,101 @@ class OrderCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Est. Weight:',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text(quantity.toString(),
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
+                      Text(
+                        'Est. Weight:',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
+                      Text(
+                        widget.quantity.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
                     ],
                   ),
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Est. Income:',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text(estIncome.toString(),
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
+                      Text(
+                        'Est. Income:',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
+                      Text(
+                        widget.estIncome.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
                     ],
                   ),
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Pickup Date:',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text(pickUpDate,
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
+                      Text(
+                        'Pickup Date:',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
+                      Text(
+                        widget.pickUpDate,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
                     ],
-                  ),            
+                  ),
                   // Address
-                   Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Pickup Address:',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
-                       Text('${address} ${cityName} ${stateName}',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13),),
+                      Text(
+                        'Pickup Address:',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
+                      Text(
+                        '${widget.address} ${widget.cityName} ${widget.stateName}',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 13),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
             SizedBox(height: 16),
-            
+
             // Cancel Request Button
-            Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                 width: double.infinity,
-                child: ElevatedButton(
-                  
-                  onPressed: () {
-                    // Handle cancel request
-                  },
-                   style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                backgroundColor: Customcolors.teal,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                              ),
-                  child: Text('Cancel Request', style: TextStyle(
-                    color: Customcolors.white,
-                    fontWeight: FontWeight.bold
-                  ),),
+            Visibility(
+              visible: widget.status != "Completed",
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      cancelUserOrder();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      backgroundColor: Customcolors.teal,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    child: widget.status == 'Approved'
+                        ? Text(
+                            'Cancel Request',
+                            style: TextStyle(
+                                color: Customcolors.white,
+                                fontWeight: FontWeight.bold),
+                          )
+                        : Text(
+                            'Cancel Request',
+                            style: TextStyle(
+                                color: Customcolors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                  ),
                 ),
               ),
             ),
@@ -307,4 +478,3 @@ class OrderCard extends StatelessWidget {
     );
   }
 }
-

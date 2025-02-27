@@ -1,4 +1,4 @@
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/my_points.dart';
 import 'package:energy_chleen/screens/recycle_report.dart';
 import 'package:energy_chleen/utils/Helper.dart';

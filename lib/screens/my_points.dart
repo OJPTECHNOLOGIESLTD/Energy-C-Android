@@ -1,4 +1,4 @@
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/how_it_works.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
@@ -151,7 +151,7 @@ class _MyPointsPageState extends State<MyPointsPage> {
                           width: 140,
                           child: CircularProgressIndicator(
                             strokeCap: StrokeCap.round,
-                            value: userpoint.points /
+                            value: userpoint.points! /
                                 user.nextLevelPoints, // progress percentage (20/50 recycled)
                             strokeWidth: 20,
                             backgroundColor: Customcolors.offwhite,

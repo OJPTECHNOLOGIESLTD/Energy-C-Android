@@ -1,4 +1,4 @@
-import 'package:energy_chleen/data/api_service.dart';
+import 'package:energy_chleen/data/controllers/api_service.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/cards/news_and_event_card.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';

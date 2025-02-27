@@ -1,11 +1,10 @@
 import 'package:energy_chleen/screens/home_pickup.dart';
-import 'package:energy_chleen/screens/recyclingpage.dart';
+import 'package:energy_chleen/screens/item_confirmation.dart';
 import 'package:energy_chleen/screens/wastes/waste_info.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RequestSummary extends StatefulWidget {
   const RequestSummary({super.key});
@@ -25,246 +24,207 @@ class _RequestSummaryState extends State<RequestSummary> {
   List<WasteInfoCard> wasteCards = [];
   bool isLoading = true;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadScheduleData();
-  }
-
-  Future<void> _loadScheduleData() async {
-    try {
-      StorageService storageService = StorageService();
-
-      // Load pickup details
-      Map<String, dynamic> pickupDetails = await storageService.loadPickupDetails();
-      Map<String, dynamic> wasteDetails = await storageService.loadWasteDetails();
-
-      setState(() {
-        _pickupAddressController.text = pickupDetails['pickupAddress'] ?? '';
-        _cityController.text = pickupDetails['city'] ?? '';
-        _stateController.text = pickupDetails['state'] ?? '';
-        pickupDate = pickupDetails['pickupDate'];
-
-        wasteType = wasteDetails['wasteType'];
-        weight = wasteDetails['weight'];
-        estPrice = wasteDetails['estPrice'];
-
-        if (wasteType != null && weight != null && estPrice != null) {
-          _addWasteCard(wasteType!, weight!, estPrice!);
-        }
-        isLoading = false;
-      });
-    } catch (e) {
-      debugPrint("Error loading data: $e");
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  void _addWasteCard(String wasteType, int weight, int estimatedIncome) {
-    setState(() {
-      wasteCards.add(WasteInfoCard(
-        wasteType: wasteType,
-        weight: weight,
-        estimatedIncome: estimatedIncome,
-        editWasteDetails: () {}, // Placeholder for edit functionality
-        removeWasteType: () => _removeWasteType(wasteType),
-        pickupDate: pickupDate ?? DateTime.now(),
-      ));
-    });
-  }
-
-  Future<void> _removeWasteType(String wasteTypeToRemove) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('wasteType');
-    await prefs.remove('weight');
-    await prefs.remove('estPrice');
-
-    setState(() {
-      wasteCards.removeWhere((card) => card.wasteType == wasteTypeToRemove);
-    });
-  }
-
-  @override
-  void dispose() {
-    _pickupAddressController.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    super.dispose();
-  }
-
-  Widget _buildWasteTypeAndDetails() {
-    if (isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-
-    if (wasteCards.isEmpty) {
-      return SizedBox(
-        height: MediaQuery.of(context).size.height *0.6,
-        child: Center(
-          child: Text(
-            textAlign: TextAlign.center,
-            'No Waste To Recycle',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-        ),
-      );
-    }
-
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: ListView.separated(
-        itemCount: wasteCards.length,
-        itemBuilder: (context, index) => wasteCards[index],
-        separatorBuilder: (context, index) => SizedBox(height: 10),
-      ),
-    );
-  }
-
-  Future<void> _showWasteTypeDialog() async {
-  List<String> wasteTypes = ['Plastic', 'Glass', 'Paper', 'Metal'];
-  String? selectedWasteType;
-
-  // Show the dialog
-  selectedWasteType = await showDialog<String>(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text('Select Waste Type'),
-        content: SizedBox(
-          height: 100,
-          child: ListView.builder(
-            itemCount: wasteTypes.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Center(child: Text(wasteTypes[index])),
-                onTap: () {
-                  Navigator.pop(context, wasteTypes[index]); // Return selected waste type
-                },
-              );
-            },
-          ),
-        ),
-      );
-    },
-  );
-
-  if (selectedWasteType != null) {
-    // Add waste card and navigate to RecyclingPage
-    setState(() {
-      _addWasteCard(selectedWasteType!, 1, 2); // Example data
-    });
-
-    // Navigate after updating the state
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecyclingPage(
-          wasteType: selectedWasteType!,
-          actionType1: true,
-        ),
-      ),
-    );
-  }
+@override
+void initState() {
+  super.initState();
+  _loadPickupDetails(); // Load pickup details
+  _loadWasteDetails();  // Load waste details
 }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar1(title: 'Request Summary'),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            RecyclingScheduleProgress(isReviewing: true, isCompleted: false, isTakingPhoto: false,),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Pickup Address',
-                        style: TextStyle(
-                            color: Customcolors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePickupDetails(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          'Change',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                      '${_pickupAddressController.text} ${_cityController.text} ${_stateController.text}')
-                ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+Future<void> _loadPickupDetails() async {
+  setState(() {
+    isLoading = true; // Start loading
+  });
+
+  Map<String, dynamic> pickupDetails = await StorageService().loadPickupDetails();
+  print('Pickup Address: ${pickupDetails['pickupAddress']}');
+  print('City: ${pickupDetails['city']}');
+
+  setState(() {
+    // Update controllers with data from pickupDetails
+    _pickupAddressController.text = pickupDetails['pickupAddress'] ?? '';
+    _cityController.text = pickupDetails['city'] ?? '';
+    _stateController.text = pickupDetails['state'] ?? '';
+
+    isLoading = false; // End loading after data is loaded
+  });
+}
+
+Future<void> _loadWasteDetails() async {
+  setState(() {
+    isLoading = true; // Start loading
+  });
+
+  Map<String, dynamic> wasteDetails = await StorageService().loadWasteDetails();
+  print('Waste Type: ${wasteDetails['wasteType']}');
+  print('Weight: ${wasteDetails['weight']}');
+  print('Estimated Price: ${wasteDetails['estPrice']}');
+
+  setState(() {
+    // Add waste card based on waste details
+    _addWasteCard(
+      wasteDetails['wasteType'] ?? 'Unknown',
+      wasteDetails['weight']?.toInt() ?? 0,
+      wasteDetails['estPrice']?.toInt() ?? 0,
+    );
+
+    isLoading = false; // End loading after waste data is loaded
+  });
+}
+
+void _addWasteCard(String wasteType, int weight, int estimatedIncome) {
+  setState(() {
+    wasteCards.add(WasteInfoCard(
+      wasteType: wasteType,
+      weight: weight,
+      estimatedIncome: estimatedIncome,
+      editWasteDetails: () {}, // Placeholder for edit functionality
+      removeWasteType: () => _removeWasteType(wasteType),
+      pickupDate: pickupDate ?? DateTime.now(), // Replace this with actual pickup date if you have it
+    ));
+  });
+}
+
+void _removeWasteType(String wasteType) {
+  // Logic to remove waste type from storage and UI
+  setState(() {
+    wasteCards.removeWhere((card) => card.wasteType == wasteType);
+  });
+}
+
+Widget _buildWasteTypeAndDetails() {
+  if (isLoading) {
+    return Expanded(
+      child: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  if (wasteCards.isEmpty) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.6,
+      child: Center(
+        child: Text(
+          textAlign: TextAlign.center,
+          'No Waste To Recycle',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  return SizedBox(
+    height: MediaQuery.of(context).size.height * 0.6,
+    child: ListView.separated(
+      itemCount: wasteCards.length,
+      itemBuilder: (context, index) => wasteCards[index],
+      separatorBuilder: (context, index) => SizedBox(height: 10),
+    ),
+  );
+}
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: CustomAppBar1(title: 'Request Summary'),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          RecyclingScheduleProgress(isReviewing: true, isCompleted: false, isTakingPhoto: false),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Waste Type',
-                  style: TextStyle(
-                      color: Customcolors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10,),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(40),
-                    color: Colors.teal.withOpacity(0.1),
-                  ),
-                  child: TextButton(
-                    onPressed: _showWasteTypeDialog,
-                    child: Text(
-                      'Add +',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Pickup Address',
                       style: TextStyle(
                           color: Customcolors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 16),
                     ),
-                  ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePickupDetails(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Change',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  '${_pickupAddressController.text} ${_cityController.text} ${_stateController.text}',
                 ),
               ],
             ),
-            _buildWasteTypeAndDetails(),
-
-            
-if (wasteCards.isNotEmpty)
-             GestureDetector(
-              onTap: (){},
-               child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: Customcolors.teal
-                      ),
-                      child: Text('Next',
-                      textAlign: TextAlign.center,
-                          style: TextStyle(fontWeight: FontWeight.bold,
-                          color: Customcolors.white)),
-                    ),
-             )
-          ],
-        ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Waste Type',
+                style: TextStyle(
+                    color: Customcolors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(40),
+                  color: Colors.teal.withOpacity(0.1),
+                ),
+                child: TextButton(
+                  onPressed: (){},
+                  child: Text(
+                    'Add +',
+                    style: TextStyle(
+                        color: Customcolors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          _buildWasteTypeAndDetails(),
+          if (wasteCards.isNotEmpty)
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ItemConfirmation(),
+                    ));
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Customcolors.teal,
+                ),
+                child: Text(
+                  'Next',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Customcolors.white),
+                ),
+              ),
+            ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

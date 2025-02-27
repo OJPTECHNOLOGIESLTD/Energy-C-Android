@@ -1,4 +1,4 @@
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/Auth_Screens/signup.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/gestures.dart';

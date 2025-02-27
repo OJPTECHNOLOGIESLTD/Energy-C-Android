@@ -1,4 +1,5 @@
-import 'package:energy_chleen/data/auth_controller.dart';
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/recyclingpage.dart';
 import 'package:energy_chleen/screens/wastes/waste_type.dart';
 import 'package:energy_chleen/utils/Helper.dart';
@@ -13,28 +14,36 @@ class StartRecyclingWaste extends StatefulWidget {
 }
 
 class _StartRecyclingWasteState extends State<StartRecyclingWaste> {
+  final authController = Get.find<AuthController>();
+
+  @override
+  void initState() {
+    super.initState();
+    authController.fetchWasteItems(); // Fetch waste items when the widget is initialized
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle('Recycle'),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.35, // Adjust the height of the PageView to fit content
+          height: MediaQuery.of(context).size.height * 0.35,
           child: Obx(() {
-            if (authController.wasteDetails.value == null) {
-              return ShimmerEffects(height: 0.03);
+            if (authController.wasteItems.isEmpty) {
+              return ShimmerEffects(height: 0.3);
             } else {
               return PageView.builder(
-                itemCount: 3, // Define how many pages you want to display
+                itemCount: 3, // Display all waste items
                 itemBuilder: (context, index) {
-                  return PageviewItem();
+                  return PageviewItem(wasteItem: authController.wasteItems[index]);
                 },
               );
             }
-          }),
+          }
+          ),
         ),
       ],
     );
@@ -48,7 +57,7 @@ class _StartRecyclingWasteState extends State<StartRecyclingWaste> {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           GestureDetector(
             onTap: () {
@@ -56,12 +65,12 @@ class _StartRecyclingWasteState extends State<StartRecyclingWaste> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => WasteTypesPage()));
             },
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
               decoration: BoxDecoration(
                 color: Customcolors.teal,
                 borderRadius: BorderRadius.circular(40),
               ),
-              child: Text(
+              child: const Text(
                 'View All',
                 style: TextStyle(color: Customcolors.white, fontWeight: FontWeight.bold),
               ),
@@ -72,17 +81,15 @@ class _StartRecyclingWasteState extends State<StartRecyclingWaste> {
     );
   }
 }
-
 class PageviewItem extends StatelessWidget {
-  const PageviewItem({
-    super.key,
-  });
+  final WasteItem wasteItem; // Accept a waste item
+
+  const PageviewItem({super.key, required this.wasteItem});
 
   @override
   Widget build(BuildContext context) {
-    final authController = Get.find<AuthController>();
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 1,
+      width: MediaQuery.of(context).size.width,
       child: Card(
         color: Customcolors.offwhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -92,42 +99,36 @@ class PageviewItem extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Image.network(
-                authController.wasteDetails.value?.image ?? 'https://via.placeholder.com/150', // Placeholder image URL
+                wasteItem.image ?? 'https://via.placeholder.com/150',
                 width: MediaQuery.of(context).size.width * 0.4,
                 errorBuilder: (context, error, stackTrace) {
                   return Image.asset(
-                    'assets/Recycle-bin-green.png', // Path to your local placeholder image
+                    'assets/Recycle-bin-green.png', // Local placeholder image
                     width: MediaQuery.of(context).size.width * 0.4,
                   );
                 },
               ),
             ),
-
             Container(
-              margin: EdgeInsets.only(top: 10),
+              margin: const EdgeInsets.only(top: 10),
               width: MediaQuery.of(context).size.width * 0.5,
-              height: 50,
+              // height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   elevation: 4,
                   backgroundColor: Customcolors.teal,
-                  side: BorderSide(
-                    color: Customcolors.offwhite, // Border color
-                    width: 0, // Border thickness
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  side: BorderSide(color: Customcolors.offwhite, width: 0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 onPressed: () {
-                  _navigateToRecyclingPage(context);
+                  _navigateToRecyclingPage(context, wasteItem);
                 },
-                child: Text(
-                  'Recycle ${authController.wasteDetails.value?.name ?? ''}',
-                  style: TextStyle(
-                    fontSize: 18, // Adjusts the text size inside the button
-                    fontWeight: FontWeight.bold,
-                    color: Customcolors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    'Recycle ${wasteItem.name}',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Customcolors.white),
                   ),
                 ),
               ),
@@ -138,23 +139,16 @@ class PageviewItem extends StatelessWidget {
     );
   }
 
-  void _navigateToRecyclingPage(BuildContext context) async {
-    // Get waste type title strictly from the backend
-    final authController = Get.find<AuthController>();
-
-    if (authController.wasteDetails.value != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => RecyclingPage(
-            wasteType: authController.wasteDetails.value!.name,
-            actionType1: false,
-          ), // Pass waste type title
+  void _navigateToRecyclingPage(BuildContext context, WasteItem wasteItem) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecyclingPage(
+          wasteType: wasteItem.name,
+          actionType1: false,
         ),
-      );
-      print("Navigating to recycling page with waste type: ${authController.wasteDetails.value!.name}");
-    } else {
-      print("Error: Waste details not available.");
-    }
+      ),
+    );
+    print("Navigating to recycling page with waste type: ${wasteItem.name}");
   }
 }

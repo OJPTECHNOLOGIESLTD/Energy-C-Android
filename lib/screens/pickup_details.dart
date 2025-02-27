@@ -4,6 +4,7 @@ import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/buttons/toggle_btn.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PickUpDetailsPage extends StatefulWidget {
   @override
@@ -11,7 +12,30 @@ class PickUpDetailsPage extends StatefulWidget {
 }
 
 class _PickUpDetailsPageState extends State<PickUpDetailsPage> {
-  int _selectedOption = 1; // 1 for Home Pick Up, 2 for Pick Up Station
+int _selectedOption = 1; // 'home' for Home Pick Up, 'station' for Pick Up Station
+String pickedSelection = 'home';
+Future<void> _savePickupSelection() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  try {
+    setState(() {
+      // No need for condition inside setState since you already know _selectedOption's value
+    });
+
+    // Save the selected option (either 'home' or 'station') under the same key
+    await prefs.setString('pickupOption', pickedSelection);
+
+    print('Pickup option ($pickedSelection) saved in SharedPreferences');
+  } catch (e) {
+    print('Error saving data: $e');
+  }
+}
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _savePickupSelection();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +64,8 @@ class _PickUpDetailsPageState extends State<PickUpDetailsPage> {
                       isSelected: _selectedOption == 1,
                       onTap: () {
                         setState(() {
-                          _selectedOption = 1;
+                          _savePickupSelection();
+                          pickedSelection =='home';
                         });
                       },
                     ),
@@ -49,7 +74,8 @@ class _PickUpDetailsPageState extends State<PickUpDetailsPage> {
                       isSelected: _selectedOption == 2,
                       onTap: () {
                         setState(() {
-                          _selectedOption = 2;
+                          _savePickupSelection();
+                          pickedSelection =='station';
                         });
                       },
                     ),

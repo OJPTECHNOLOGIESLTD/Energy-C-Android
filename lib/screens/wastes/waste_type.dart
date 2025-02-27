@@ -1,79 +1,60 @@
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/screens/recyclingpage.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class WasteTypesPage extends StatelessWidget {
-  final List<Map<String, String>> metalWaste = [
-    {'name': 'Iron', 'price': 'NGN 620/kg', 'image': 'assets/Iron.jpg'},
-    {'name': 'Copper', 'price': 'NGN 1,050/kg', 'image': 'assets/Copper.jpg'},
-    {
-      'name': 'Aluminum Zinc',
-      'price': 'NGN 2,000/kg',
-      'image': 'assets/Aluminum_zinc.jpg'
-    },
-    {'name': 'Empty Cans', 'price': 'NGN 1,700/kg', 'image': 'assets/cans.jpg'},
-    {
-      'name': 'Light Aluminum',
-      'price': 'NGN 2,200/kg',
-      'image': 'assets/light_aluminum.jpg'
-    },
-    {
-      'name': 'Thick Aluminum',
-      'price': 'NGN 1,800/kg',
-      'image': 'assets/Aluminum-recycling-.jpg'
-    },
-    {
-      'name': 'Aluminum Wire',
-      'price': 'NGN 1,000/kg',
-      'image': 'assets/light_aluminum.jpg'
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final authController = Get.find<AuthController>();
+
     return Scaffold(
       appBar: CustomAppBar1(title: 'Waste Types'),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Description
             SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Discover the value of your recyclables! This page lists all the waste types we accept and their current rates',
+                'Discover the value of your recyclables! This page lists all the waste types we accept and their current rates.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
             ),
             SizedBox(height: 40),
+            
             // Metal Waste Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                 _buildwWasteTypeContainer(context: context, title: 'METAL WASTE'),
-                  SizedBox(height: 40 ),
-                  // Optimized ListView.builder
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: metalWaste.length,
-                    itemBuilder: (context, index) {
-                      final waste = metalWaste[index];
-                      return buildWasteItem(
-                        context: context,
-                        imagePath: waste['image']!,
-                        name: waste['name']!,
-                        price: waste['price']!,
+                  _buildWasteTypeContainer(context: context, title: 'METAL WASTE'),
+                  SizedBox(height: 40),
+
+                  Obx(() {
+                    if (authController.wasteItems.isEmpty) {
+                      return ShimmerEffects(height: 0.3);
+                    } else {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: authController.wasteItems.length,
+                        itemBuilder: (context, index) {
+                          final waste = authController.wasteItems[index];
+                          return buildWasteItem(context: context, wasteItem: waste);
+                        },
                       );
-                    },
-                  ),
+                    }
+                  }),
+
                   SizedBox(height: 16),
-                  // Paper Waste Section
-                  _buildwWasteTypeContainer(context: context, title: 'PAPER WASTE')
+                  _buildWasteTypeContainer(context: context, title: 'PAPER WASTE'),
                 ],
               ),
             ),
@@ -83,36 +64,57 @@ class WasteTypesPage extends StatelessWidget {
     );
   }
 
-  Widget buildWasteItem(
-      {required String imagePath,
-      required String name,
-      required String price,
-      required BuildContext context}) {
+  Widget buildWasteItem({required BuildContext context, required WasteItem wasteItem}) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>RecyclingPage(wasteType: name, actionType1: true,))),
+      onTap: () {
+        _navigateToRecyclingPage(context, wasteItem);
+      },
       child: Card(
         child: ListTile(
-          leading:
-              Image.asset(imagePath, width: 50, height: 50, fit: BoxFit.cover),
-          title: Text(name),
-          trailing: Text(price),
+          leading: Image.network(
+                wasteItem.image ?? 'https://via.placeholder.com/150',
+                width: 50,
+                height: 50,
+                fit:  BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/Recycle-bin-green.png', // Local placeholder image
+                    width: MediaQuery.of(context).size.width * 0.4,
+                  );
+                },
+              ),
+          title: Text(wasteItem.name),
+          trailing: Text(wasteItem.price.toString()),
         ),
       ),
     );
   }
-  Widget _buildwWasteTypeContainer({String? title,
-  required BuildContext context,}){
+
+  Widget _buildWasteTypeContainer({required BuildContext context, required String title}) {
     return Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      color: Customcolors.teal
-                    ),
-                    child: Text(title!,
-                    textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.bold,
-                        color: Customcolors.white)),
-                  );
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        color: Customcolors.teal,
+      ),
+      child: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold, color: Customcolors.white),
+      ),
+    );
+  }
+
+  void _navigateToRecyclingPage(BuildContext context, WasteItem wasteItem) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RecyclingPage(
+          wasteType: wasteItem.name,
+          actionType1: true,
+        ),
+      ),
+    );
   }
 }

@@ -1,7 +1,9 @@
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/request_summary.dart';
 import 'package:energy_chleen/utils/Helper.dart';
+import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart'; // To format the date
 class HomePickupDetails extends StatefulWidget {
   const HomePickupDetails({super.key});
@@ -15,12 +17,12 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
   DateTime? _selectedDate;
 
   // Add lists for cities and states
-  final List<String> cities = ['Enugu', 'Lagos', 'Abuja', 'Port Harcourt'];
-  final List<String> states = ['Enugu State', 'Lagos State', 'Abuja FCT', 'Rivers State'];
+  final List<String> cityNames = AuthController.instance.cities.map((city) => city.name).toList();
+  final List<String> stateNames = AuthController.instance.states.map((state) => state.name).toList();
 
   // Selected city and state variables
-  String? _selectedCity;
-  String? _selectedState;
+  CityName? _selectedCity;
+  StateData? _selectedState;
 
   @override
   void dispose() {
@@ -28,24 +30,25 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
     super.dispose();
   }
 
-  Future<void> _savePickupDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
-      await prefs.setString('pickupAddress', _pickupAddressController.text);
-      if (_selectedCity != null) {
-        await prefs.setString('city', _selectedCity!);
-      }
-      if (_selectedState != null) {
-        await prefs.setString('state', _selectedState!);
-      }
-      if (_selectedDate != null) {
-        await prefs.setString('pickupDate', DateFormat('yyyy-MM-dd').format(_selectedDate!));
-      }
-      print('Details saved in SharedPreferences');
-    } catch (e) {
-      print('Error saving data: $e');
-    }
+Future<void> _savePickupDetails() async {
+  StorageService storageService = StorageService();
+
+  if (_selectedCity != null && _selectedState != null && _selectedDate != null) {
+    // Example usage of saving pickup details
+    await storageService.savePickupDetails(
+      pickupAddress: _pickupAddressController.text,
+      city: _selectedCity!.name,
+      state: _selectedState!.name,
+      pickupOption: "home",
+      pickupDate: _selectedDate!, // Use _selectedDate directly
+      cityId: _selectedCity!.id,
+      stateId: _selectedState!.id,
+    );
+  } else {
+    print('Please select a valid city, state, and date.');
   }
+}
+
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -73,16 +76,20 @@ class _HomePickupDetailsState extends State<HomePickupDetails> {
     return Column(
       children: [
         _buildTextField('Pick Up Address', 3, _pickupAddressController),
-        _buildDropdown('City/Town', cities, _selectedCity, (value) {
-          setState(() {
-            _selectedCity = value;
-          });
-        }),
-        _buildDropdown('State', states, _selectedState, (value) {
-          setState(() {
-            _selectedState = value;
-          });
-        }),
+// Dropdown for City
+_buildDropdown('City/Town', cityNames, _selectedCity?.name, (value) {
+  setState(() {
+    _selectedCity = AuthController.instance.cities.firstWhere((city) => city.name == value);
+  });
+}),
+
+// Dropdown for State
+_buildDropdown('State', stateNames, _selectedState?.name, (value) {
+  setState(() {
+    _selectedState = AuthController.instance.states.firstWhere((state) => state.name == value);
+  });
+}),
+
         Text('Choose Pick Up Date & Time', style: TextStyle(fontWeight: FontWeight.bold)),
         InkWell(
           onTap: () {
