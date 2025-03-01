@@ -1,3 +1,5 @@
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/home_pickup.dart';
 import 'package:energy_chleen/screens/item_confirmation.dart';
 import 'package:energy_chleen/screens/wastes/waste_info.dart';
@@ -5,6 +7,7 @@ import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RequestSummary extends StatefulWidget {
   const RequestSummary({super.key});
@@ -54,16 +57,19 @@ Future<void> _loadWasteDetails() async {
   setState(() {
     isLoading = true; // Start loading
   });
-
+  Map<String, dynamic> wasteType = await StorageService().loadWasteItem();
   Map<String, dynamic> wasteDetails = await StorageService().loadWasteDetails();
-  print('Waste Type: ${wasteDetails['wasteType']}');
+
+  print('Waste Type: ${wasteType['wasteType']}');
   print('Weight: ${wasteDetails['weight']}');
   print('Estimated Price: ${wasteDetails['estPrice']}');
 
   setState(() {
     // Add waste card based on waste details
+   
     _addWasteCard(
-      wasteDetails['wasteType'] ?? 'Unknown',
+      // wasteDetails['weight'].toString(),
+      wasteType['wasteType'] ?? 'Unknown',
       wasteDetails['weight']?.toInt() ?? 0,
       wasteDetails['estPrice']?.toInt() ?? 0,
     );
@@ -72,7 +78,7 @@ Future<void> _loadWasteDetails() async {
   });
 }
 
-void _addWasteCard(String wasteType, int weight, int estimatedIncome) {
+void _addWasteCard(String wasteType, int weight, int estimatedIncome) async{
   setState(() {
     wasteCards.add(WasteInfoCard(
       wasteType: wasteType,

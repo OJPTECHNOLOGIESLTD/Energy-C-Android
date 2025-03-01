@@ -1,3 +1,4 @@
+import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class _RecycleReportScreenState extends State<RecycleReportScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            '18kg',
+                            '${AuthController.instance.userDetails.value!.wasteWeight.toString()} kg',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,

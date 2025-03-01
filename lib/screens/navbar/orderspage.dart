@@ -1,45 +1,53 @@
 import 'dart:convert';
+import 'package:energy_chleen/data/controllers/api_service.dart';
 import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderService {
   final String baseUrl = "https://backend.energychleen.ng/api"; // Replace with your API base URL
 
-Future<Map<String, dynamic>> cancelOrder(String orderId) async {
-  final url = Uri.parse("$baseUrl/cancel/$orderId");
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token')?.trim() ?? '';
+  Future<Map<String, dynamic>> cancelOrder(String orderId) async {
+    final url = Uri.parse("$baseUrl/orders/${AuthController.instance.userDetails.value!.id}/cancel/$orderId");
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token')?.trim() ?? '';
 
-  print("Token: Bearer $token"); // Check the full token format
+    print("Token: Bearer $token"); // Check the full token format
 
-  try {
-    final response = await http.post(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token", // Correctly formatted with "Bearer"
-      "Accept": "application/json",
-    }, body: jsonEncode({}));
+    try {
+      final response = await http.post(url, headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token", // Correctly formatted with "Bearer"
+        "Accept": "application/json",
+      }, body: jsonEncode({
+        "orderId": orderId, // Include orderId in the request body
+      }));
 
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      return {
-        "error": "Failed to cancel order",
-        "statusCode": response.statusCode,
-        "message": response.body
-      };
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        Get.snackbar("Success", 'Order ${orderId} been successfully canceled',
+          backgroundColor: Customcolors.teal, colorText: Customcolors.white);
+        return jsonDecode(response.body);
+          
+      } else {
+        return {
+          "error": "Failed to cancel order",
+          "statusCode": response.statusCode,
+          "message": response.body
+        };
+      }
+    } catch (e) {
+      return {"error": "An error occurred", "details": e.toString()};
     }
-  } catch (e) {
-    return {"error": "An error occurred", "details": e.toString()};
   }
 }
-}
+
 
 class OrdersPage extends StatefulWidget {
   @override
@@ -162,52 +170,57 @@ FutureBuilder<List<Order>>(
 
             if (approved && order.status == 'Approved') {
               return OrderCard(
-                materialType: order.wasteItemId.toString(),
-                orderId: order.orderId,
-                status: order.status,
-                quantity: order.totalWeight,
-                estIncome: order.totalPrice,
-                pickUpDate: order.date,
-                address: order.address,
-                cityName: order.cityId,
-                stateName: order.stateId,
+  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
+  orderId: order.orderId,
+  status: order.status,
+  quantity: order.totalWeight,
+  estIncome: order.totalPrice,
+  pickUpDate: order.date,
+  address: order.address,
+  cityName: order.cityId,
+  stateName: order.stateId,
+  points: order.point,
+
               );
             } else if (pending && order.status == 'Pending') {
               return OrderCard(
-                materialType: order.wasteItemId.toString(),
-                orderId: order.orderId,
-                status: order.status,
-                quantity: order.totalWeight,
-                estIncome: order.totalPrice,
-                pickUpDate: order.date,
-                address: order.address,
-                cityName: order.cityId,
-                stateName: order.stateId,
-              );
-            } else if (cancelled && order.status == 'Cancelled') {
+  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
+  orderId: order.orderId,
+  status: order.status,
+  quantity: order.totalWeight,
+  estIncome: order.totalPrice,
+  pickUpDate: order.date,
+  address: order.address,
+  cityName: order.cityId,
+  stateName: order.stateId,
+  points: order.point,
+);
+            } else if (cancelled && order.status == 'Canceled') {
               return OrderCard(
-                materialType: order.wasteItemId.toString(),
-                orderId: order.orderId,
-                status: order.status,
-                quantity: order.totalWeight,
-                estIncome: order.totalPrice,
-                pickUpDate: order.date,
-                address: order.address,
-                cityName: order.cityId,
-                stateName: order.stateId,
-              );
+  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
+  orderId: order.orderId,
+  status: order.status,
+  quantity: order.totalWeight,
+  estIncome: order.totalPrice,
+  pickUpDate: order.date,
+  address: order.address,
+  cityName: order.cityId,
+  stateName: order.stateId,
+  points: order.point,
+);
             }else if (completed && order.status == 'Completed') {
               return OrderCard(
-                materialType: order.wasteItemId.toString(),
-                orderId: order.orderId,
-                status: order.status,
-                quantity: order.totalWeight,
-                estIncome: order.totalPrice,
-                pickUpDate: order.date,
-                address: order.address,
-                cityName: order.cityId,
-                stateName: order.stateId,
-              );
+  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
+  orderId: order.orderId,
+  status: order.status,
+  quantity: order.totalWeight,
+  estIncome: order.totalPrice,
+  pickUpDate: order.date,
+  address: order.address,
+  cityName: order.cityId,
+  stateName: order.stateId,
+  points: order.point,
+);
             }
 
             // If no order matches, return empty container
@@ -268,6 +281,7 @@ class OrderCard extends StatefulWidget {
   final String address;
   final int cityName;
   final int stateName;
+  final double points;
 
   const OrderCard({
     required this.materialType,
@@ -278,7 +292,7 @@ class OrderCard extends StatefulWidget {
     required this.pickUpDate,
     required this.address,
     required this.cityName,
-    required this.stateName,
+    required this.stateName, required this.points,
   });
 
   @override
@@ -315,164 +329,218 @@ class _OrderCardState extends State<OrderCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Material Type and Order ID
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  decoration: BoxDecoration(
-                      color: Customcolors.teal,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Text(
-                    widget.materialType,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500, color: Customcolors.white),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(widget.orderId.toString(),
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-
-                    // Status
-                    Text(
-                      widget.status,
-                      style: TextStyle(
-                        color: widget.status == 'Approved'
-                            ? Colors.green
-                            : widget.status == 'Pending'
-                                ? Colors.orange
-                                : widget.status == 'Completed'
-                                    ? Colors.green
-                                    : widget.status == 'Cancelled'
-                                        ? Colors.red
-                                        : Colors
-                                            .black, // Default color if none match
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            // Estimated Weight and Income
-            Container(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        elevation: 4,
+        // color: Colors.grey.shade200,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Material Type and Order ID
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Est. Weight:',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                      Text(
-                        widget.quantity.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                    ],
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    decoration: BoxDecoration(
+                        color: Customcolors.teal,
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Text(
+                      widget.materialType,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, color: Customcolors.white),
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      Text(widget.orderId.toString(),
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+      
+                      // Status
                       Text(
-                        'Est. Income:',
+                        widget.status,
                         style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                      Text(
-                        widget.estIncome.toString(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Pickup Date:',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                      Text(
-                        widget.pickUpDate,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  // Address
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Pickup Address:',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
-                      ),
-                      Text(
-                        '${widget.address} ${widget.cityName} ${widget.stateName}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 13),
+                          color: widget.status == 'Approved'
+                              ? Colors.green
+                              : widget.status == 'Pending'
+                                  ? Colors.orange
+                                  : widget.status == 'Completed'
+                                      ? Colors.green
+                                      : widget.status == 'Canceled'
+                                          ? Colors.red
+                                          : Colors
+                                              .black, // Default color if none match
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: 16),
-
-            // Cancel Request Button
-            Visibility(
-              visible: widget.status != "Completed",
-              child: Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      cancelUserOrder();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      backgroundColor: Customcolors.teal,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+      
+              // Estimated Weight and Income
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      color: Customcolors.offwhite,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Est. Weight:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                          Text(
+                           '${ widget.quantity.toString()} kg',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                        ],
                       ),
                     ),
-                    child: widget.status == 'Approved'
-                        ? Text(
-                            'Cancel Request',
+                    SizedBox(height: 8,),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      color: Customcolors.offwhite,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Est. Income:',
                             style: TextStyle(
-                                color: Customcolors.white,
-                                fontWeight: FontWeight.bold),
-                          )
-                        : Text(
-                            'Cancel Request',
-                            style: TextStyle(
-                                color: Customcolors.white,
-                                fontWeight: FontWeight.bold),
+                                fontWeight: FontWeight.w500, fontSize: 16),
                           ),
+                          Text(
+                            'NGN ${widget.estIncome.toString()}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 8,),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      color: Customcolors.offwhite,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Pickup Date:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                          Text(
+                            widget.pickUpDate,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 8,),
+                    // Address
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Pickup Address:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                        Text(
+                          '${widget.address} ${widget.cityName} ${widget.stateName}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20,),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      color: Customcolors.offwhite,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Points to Gain:',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                          Text(
+                            '${widget.points}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+      
+              // Cancel Request Button
+              Visibility(
+                visible: widget.status == "Approved" || widget.status == "Pending",
+                child: Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (widget.status == 'Approved' || widget.status =='Pending') {
+                         cancelUserOrder(); 
+                        }else{
+                          ApiService.instance.createPost(context: context, 
+                          date: widget.pickUpDate,
+                          address: widget.address,
+                          cityId: widget.cityName,
+                          stateId: widget.stateName,
+                          pickupType: widget.materialType,
+                          wasteItems: [], images: [], videos: []);
+      
+                          print('Rescheduling..');
+                        }
+                        
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        backgroundColor: Customcolors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      child:
+                      //  widget.status == 'Approved' || widget.status =='Pending'
+                          // ? 
+                          Text(
+                              'Cancel Request',
+                              style: TextStyle(
+                                  color: Customcolors.white,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          // : Text(
+                          //     'Reschedule',
+                          //     style: TextStyle(
+                          //         color: Customcolors.white,
+                          //         fontWeight: FontWeight.bold),
+                          //   ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

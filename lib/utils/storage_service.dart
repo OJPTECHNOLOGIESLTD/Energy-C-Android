@@ -51,26 +51,40 @@ class StorageService {
 
   // Save waste details
   Future<void> saveWasteDetails({
-    required String wasteType,
     required int weight,
     required int estPrice,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('wasteType', wasteType);
     await prefs.setInt('weight', weight);
     await prefs.setInt('estPrice', estPrice);
+  }
+
+  // save Waste Item
+    Future<void> saveWasteItem({
+    required String wasteType,
+
+  }) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('wasteType', wasteType);
   }
 
   // Load waste details
   Future<Map<String, dynamic>> loadWasteDetails() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? wasteType = prefs.getString('wasteType');
     double? weight = prefs.getInt('weight')?.toDouble();
     int? estPrice = prefs.getInt('estPrice');
     return {
-      'wasteType': wasteType,
       'weight': weight,
       'estPrice': estPrice,
+    };
+  }
+
+  // load wasteItem
+    Future<Map<String, dynamic>> loadWasteItem() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? wasteType = prefs.getString('wasteType');
+    return {
+      'wasteType': wasteType,
     };
   }
 

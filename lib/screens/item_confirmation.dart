@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:energy_chleen/data/controllers/api_service.dart';
 import 'package:energy_chleen/data/controllers/auth_controller.dart';
-import 'package:energy_chleen/data/controllers/orders_controller.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
@@ -17,119 +16,9 @@ class ItemConfirmation extends StatefulWidget {
   @override
   State<ItemConfirmation> createState() => _ItemConfirmationState();
 }
-//  final String baseUrl = "https://backend.energychleen.ng/api";
 
 class _ItemConfirmationState extends State<ItemConfirmation> {
   bool isLoading =false;
-
-
-// Future<void> createOrder({
-//   required String date,
-//   required String address,
-//   required int cityId,
-//   required int stateId,
-//   required String pickupType,
-//   required List<Map<String, dynamic>> wasteItems,
-//   required List<File> images, // Change to File for actual file upload
-//   required List<File> videos, // Change to File for actual file upload
-// }) async {
-//   String url =
-//       '${AuthController.instance.baseUrl}/orders/${AuthController.instance.userDetails.value!.id}';
-
-//   // Prepare the multipart request
-//   var request = http.MultipartRequest('POST', Uri.parse(url));
-
-//   // Adding the regular fields to the request body
-//   request.fields['date'] = date;
-//   request.fields['address'] = address;
-//   request.fields['cityId'] = cityId.toString();
-//   request.fields['stateId'] = stateId.toString();
-//   request.fields['pickupType'] = pickupType;
-
-//   // Converting waste items to a JSON string
-//   request.fields['waste_items'] = jsonEncode(wasteItems);
-
-//   // Adding the images as multipart files
-//   for (var image in images) {
-//     var imageStream = http.ByteStream(image.openRead());
-//     var imageLength = await image.length();
-//     var imageMultipart = http.MultipartFile(
-//       'images[]',
-//       imageStream,
-//       imageLength,
-//       filename: basename(image.path),
-//     );
-//     request.files.add(imageMultipart);
-//   }
-
-//   // Adding the videos as multipart files
-//   for (var video in videos) {
-//     var videoStream = http.ByteStream(video.openRead());
-//     var videoLength = await video.length();
-//     var videoMultipart = http.MultipartFile(
-//       'videos[]',
-//       videoStream,
-//       videoLength,
-//       filename: basename(video.path),
-//     );
-//     request.files.add(videoMultipart);
-//   }
-
-//   print('Request URL: $url');
-//   print('Sending images: ${images.map((file) => basename(file.path))}');
-//   print('Sending videos: ${videos.map((file) => basename(file.path))}');
-
-//   // Send the request
-//   try {
-//     // Set headers
-//     request.headers['Authorization'] = 'Bearer ${AuthController.instance.token.value}';
-//     request.headers['Content-Type'] = 'multipart/form-data'; // This is needed for file uploads
-
-//     var response = await request.send().timeout(Duration(seconds: 30));
-
-//     // Capture response from the server
-//     var responseBody = await response.stream.bytesToString();
-
-//     print('Response Status Code: ${response.statusCode}');
-//     print('Response Body: $responseBody');
-
-//     if (response.statusCode == 302) {
-//       // Handle redirect if necessary
-//       String? redirectedUrl = response.headers['location'];
-//       if (redirectedUrl != null) {
-//         print('Redirected to: $redirectedUrl');
-//         var redirectedResponse = await http.post(
-//           Uri.parse(redirectedUrl),
-//           headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': 'Bearer ${AuthController.instance.token.value}',
-//           },
-//           body: jsonEncode(request.fields), // Send the same fields again
-//         ).timeout(Duration(seconds: 30));
-
-//         print('Redirected Response Status Code: ${redirectedResponse.statusCode}');
-//         print('Redirected Response Body: ${redirectedResponse.body}');
-//       } else {
-//         print('Redirect URL not found in headers');
-//       }
-//     } else if (response.statusCode == 201) {
-//       print('Order created successfully: ${responseBody}');
-//       // Check the response to see if images and videos were processed properly
-//       final responseData = jsonDecode(responseBody);
-//       print('Images in response: ${responseData['data']['images']}');
-//       print('Videos in response: ${responseData['data']['videos']}');
-//     } else {
-//       print('Failed to create order: ${response.statusCode} - $responseBody');
-//     }
-//   } on SocketException catch (e) {
-//     print('Network error: $e');
-//   } on TimeoutException catch (e) {
-//     print('Request timed out: $e');
-//   } catch (e) {
-//     print('Unexpected error: $e');
-//   }
-// }
-
 
 // load save data from shared
 
@@ -142,6 +31,8 @@ Future<void> _loadScheduleData() async {
     StorageService storageService = StorageService();
 
     // Load pickup details and waste details
+    Map<String, dynamic> wasteItems =
+        await storageService.loadWasteItem();
     Map<String, dynamic> pickupDetails =
         await storageService.loadPickupDetails();
     Map<String, dynamic> wasteDetails =
@@ -175,6 +66,7 @@ Future<void> _loadScheduleData() async {
       wasteItems: [
         {
           "waste_item_id": AuthController.instance.wasteDetails.value!.id,
+          "name": wasteItems['wasteType'],
           "totalWeight": wasteDetails['weight']
         },
       ],
@@ -300,24 +192,7 @@ Future<void> _takePhoto() async {
                     SizedBox(
                       height: 20,
                     ),
-                    GestureDetector(
-                      onTap: _pickVideo, // Trigger photo capture
-                      child: Container(
-                        height: MediaQuery.of(context).size.height * 0.2,
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(16)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.camera_alt_outlined),
-                            Text('Take Photos')
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
+                                        GestureDetector(
                       onTap: _takePhoto, // Trigger photo capture
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.2,
@@ -375,52 +250,69 @@ Future<void> _takePhoto() async {
                         },
                       ),
                     ),
+                    // GestureDetector(
+                    //   onTap: _pickVideo, // Trigger photo capture
+                    //   child: Container(
+                    //     height: MediaQuery.of(context).size.height * 0.2,
+                    //     width: MediaQuery.of(context).size.width,
+                    //     decoration: BoxDecoration(
+                    //         border: Border.all(color: Colors.grey),
+                    //         borderRadius: BorderRadius.circular(16)),
+                    //     child: Column(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         Icon(Icons.video_camera_back_outlined),
+                    //         Text('Make A Video')
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+
                     // Add functionality to remove videos
-                    SizedBox(
-                      height: 140,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _videoFiles.length,
-                        itemBuilder: (context, index) {
-                          return Stack(
-                            children: [
-                              // Similar to images, display video thumbnails or placeholders
-                              Container(
-                                margin: EdgeInsets.only(right: 10),
-                                width: 70,
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  image: DecorationImage(
-                                    image: FileImage(_videoFiles[index]),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _videoFiles.removeAt(index); // Remove video
-                                    });
-                                  },
-                                  child: Icon(Icons.cancel, color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-          
-                    SizedBox(
-                      height: 40,
-                    ),
+                    // SizedBox(
+                    //   height: 140,
+                    //   child: ListView.builder(
+                    //     scrollDirection: Axis.horizontal,
+                    //     itemCount: _videoFiles.length,
+                    //     itemBuilder: (context, index) {
+                    //       return Stack(
+                    //         children: [
+                    //           // Similar to images, display video thumbnails or placeholders
+                    //           Container(
+                    //             margin: EdgeInsets.only(right: 10),
+                    //             width: 70,
+                    //             height: 140,
+                    //             decoration: BoxDecoration(
+                    //               borderRadius: BorderRadius.circular(8),
+                    //               image: DecorationImage(
+                    //                 image: FileImage(_videoFiles[index]),
+                    //                 fit: BoxFit.cover,
+                    //               ),
+                    //             ),
+                    //           ),
+                    //           Positioned(
+                    //             top: 4,
+                    //             right: 4,
+                    //             child: GestureDetector(
+                    //               onTap: () {
+                    //                 setState(() {
+                    //                   _videoFiles.removeAt(index); // Remove video
+                    //                 });
+                    //               },
+                    //               child: Icon(Icons.cancel, color: Colors.red),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
+
+                    SizedBox(height: 20,),
+
                     // Show the Finish button only if 4 photos are taken
                     Visibility(
-                      visible: _imageFiles.length <= 4,
+                      visible: _imageFiles.length >= 2,
                       child: GestureDetector(
                         onTap: () {
                           // Handle finish action

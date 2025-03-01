@@ -6,6 +6,7 @@ import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RecyclingPage extends StatefulWidget {
   final bool actionType1;
@@ -19,6 +20,21 @@ class RecyclingPage extends StatefulWidget {
 }
 
 class _RecyclingPageState extends State<RecyclingPage> {
+  
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // _saveWasteItemName(); // Call the method to save data when the page initializes
+  // }
+
+//   Future<void> _saveWasteItemName() async {
+//     print('Waste type saved: ${widget.wasteType}');
+//     await storageService.saveWasteItem(wasteType: widget.wasteType
+
+// );
+  // }
+
+
   final StorageService storageService = StorageService();
   CityName? selectedCity;  // Variable to hold selected city
   StateData? selectedState;
@@ -39,10 +55,11 @@ class _RecyclingPageState extends State<RecyclingPage> {
 
     final wasteDetails = authController.wasteDetails.value!;
 await storageService.saveWasteDetails(
-  wasteType: wasteDetails.name,
   weight: wasteDetails.weight.toInt(), // Weight in some unit
   estPrice: wasteDetails.weight.toInt() * wasteDetails.price.toInt(), // Estimated price
 );
+
+
 
     Navigator.push(
       context,

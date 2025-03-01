@@ -116,7 +116,7 @@ class OrderResponse {
   }
 }
 
-class Order {
+class Order { 
   final int id;
   final String orderId;
   final int userId;
@@ -130,10 +130,9 @@ class Order {
   final String pickupType;
   final String status;
   final double point;
-  final int? wasteItemId;
-  final double? estimatedWeight;
-  final String? image;
-  final String? video;
+  final List<WasteItem> wasteItems; // List of waste items
+  final List<String> images; // List of image URLs
+  final List<String> videos; // List of video URLs
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -151,38 +150,43 @@ class Order {
     required this.pickupType,
     required this.status,
     required this.point,
-    required this.wasteItemId,
-    this.estimatedWeight,
-    this.image,
-    this.video,
+    required this.wasteItems, // Initialize waste items
+    required this.images, // Initialize images
+    required this.videos, // Initialize videos
     required this.createdAt,
     required this.updatedAt,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    // Convert waste items from JSON
+    var wasteItemsFromJson = json['waste_items'] as List;
+    List<WasteItem> wasteItemList = wasteItemsFromJson.map((item) => WasteItem.fromJson(item)).toList();
+
+    // Convert images and videos from JSON
+    List<String> imageList = List<String>.from(json['images'] ?? []);
+    List<String> videoList = List<String>.from(json['videos'] ?? []);
+
     return Order(
       id: json['id'],
       orderId: json['orderId'],
       userId: json['userId'],
-      totalWeight: double.tryParse(json['totalWeight'].toString()) ?? 0.0, // Convert string to double
-      totalPrice: double.tryParse(json['totalPrice'].toString()) ?? 0.0, // Convert string to double
-      estimatedIncome: double.tryParse(json['estimated_income'].toString()) ?? 0.0, // Convert string to double
-      point: double.tryParse(json['point'].toString()) ?? 0.0, // Convert string to double
+      totalWeight: double.tryParse(json['totalWeight'].toString()) ?? 0.0,
+      totalPrice: double.tryParse(json['totalPrice'].toString()) ?? 0.0,
+      estimatedIncome: double.tryParse(json['estimated_income'].toString()) ?? 0.0,
+      point: double.tryParse(json['point'].toString()) ?? 0.0,
       date: json['date'],
       address: json['address'],
       cityId: json['cityId'],
       stateId: json['stateId'],
       pickupType: json['pickupType'],
       status: json['status'],
-      wasteItemId: json['waste_item_id'],
-      estimatedWeight: json['estimated_weight'] != null ? double.tryParse(json['estimated_weight'].toString()) : null,
-      image: json['image'],
-      video: json['video'],
+      wasteItems: wasteItemList, // Add waste items list
+      images: imageList, // Add images list
+      videos: videoList, // Add videos list
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
   }
-
 
   Map<String, dynamic> toJson() {
     return {
@@ -199,19 +203,15 @@ class Order {
       "pickupType": pickupType,
       "status": status,
       "point": point,
-      "waste_item_id": wasteItemId,
-      "estimated_weight": estimatedWeight,
-      "image": image,
-      "video": video,
-      "created_at": createdAt,
-      "updated_at": updatedAt,
-      // "user": user.toJson(),
-      // "waste_item": wasteItem.toJson(),
-      // "city": city.toJson(),
-      // "state": state.toJson(),
+      "waste_items": wasteItems.map((item) => item.toJson()).toList(), // Convert waste items to JSON
+      "images": images, // Convert images to JSON
+      "videos": videos, // Convert videos to JSON
+      "created_at": createdAt.toIso8601String(),
+      "updated_at": updatedAt.toIso8601String(),
     };
   }
 }
+
 
 class User {
   final int id;
