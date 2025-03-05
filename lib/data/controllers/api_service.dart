@@ -93,7 +93,7 @@ Future<void> createPost({
   dioInstance.interceptors.add(CookieManager(CookieJar()));
 
   // Define the API URL
-  final url = 'https://backend.energychleen.ng/api/user/${AuthController.instance.userDetails.value!.id}'; // Full URL
+  final url = '$baseUrl/orders/create/${AuthController.instance.userDetails.value!.id}'; // Full URL
 
   // Get token from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
@@ -103,7 +103,7 @@ Future<void> createPost({
   final headers = {
     'Content-Type': 'multipart/form-data', // Important for file uploads
     'Authorization': 'Bearer $token',
-    'accept': 'application/json',  // Added Accept header
+    'Accept': 'application/json',  // Added Accept header
   };
 
   // Ensure pickupType is valid
@@ -151,7 +151,7 @@ Future<void> createPost({
     print('Response headers: ${response.headers}');
     print('Response body: ${response.data}');
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
       print('Data posted successfully');
      Navigator.push(
   context,
@@ -174,7 +174,74 @@ Future<void> createPost({
   }
 }
 
+Future<List<Message>> fetchMessages() async {
+    final url = Uri.parse("$baseUrl/user/${AuthController.instance.userDetails.value!.id}/messages");
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> messagesJson = data['messages'];
+
+        return messagesJson.map((json) => Message.fromJson(json)).toList();
+      } else if (response.statusCode == 404) {
+        throw Exception("User not found");
+      } else {
+        throw Exception("Failed to load messages");
+      }
+    } catch (e) {
+      throw Exception("Error: $e");
+    }
+  }
+
+Future<bool> markMessageAsRead(int messageId) async {
+  final url = Uri.parse("$baseUrl/user/$messageId/mark-as-read");
+  try {
+    final response = await http.post(url);
+
+    if (response.statusCode == 200) {
+      print(response.body);
+      final data = json.decode(response.body);
+      return data['data']['is_read'] == 1; // Check if marked as read
+    } else {
+      // Log error but don't display to the user
+      print('Failed to mark message as read. Status code: ${response.statusCode}');
+      return false; // Indicating the message was not marked as read
+    }
+  } catch (e) {
+    // Log any exceptions
+    print('Error marking message as read: $e');
+    return false; // Return false in case of error
+  }
+}
+
+Future<int> getUnreadMessageCount() async {
+  final url = Uri.parse("$baseUrl/user/${AuthController.instance.userDetails.value!.id}/unread-count");
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      // Ensure the response contains 'unread_count' and it is an integer
+      if (data != null && data.containsKey('unread_count') && data['unread_count'] is int) {
+        return data['unread_count']; // Return the unread message count
+      } else {
+        throw Exception("Unread count not found or invalid format");
+      }
+    } else {
+      throw Exception("Failed to fetch unread count. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error: $e");
+    throw Exception("Error fetching unread count: $e");
+  }
+}
 
 }
+
+
 
 

@@ -1,11 +1,38 @@
+import 'package:energy_chleen/data/controllers/api_service.dart';
 import 'package:energy_chleen/screens/notification.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  State<CustomAppBar> createState() => _CustomAppBarState();
+  
+  @override
+    Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _CustomAppBarState extends State<CustomAppBar> {
+  int unread_count = 0;
+  final ApiService apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUnreadCount();
+  }
+  
+  void fetchUnreadCount()async{
+    try{
+      int count = await apiService.getUnreadMessageCount();
+      setState(() {
+        unread_count = count;
+      });
+    }catch(e){
+      print('Error fetching unread count: $e');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +77,46 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 SizedBox(
                   width: 10,
                 ),
-                CircleAvatar(
-                  backgroundColor: Customcolors
-                      .teal, // Customcolors.teal can be replaced with this for simplicity
-                  child: IconButton(
-                    icon: const Icon(Icons.notifications_outlined,
-                        color: Colors.white),
-                    onPressed: () {
-                      // Add notification logic here
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Notifications()));
-                    },
+                SizedBox(
+                  height: 40,
+                  width: 60,
+                  child: Stack(
+                    children: [
+                      
+                      CircleAvatar(
+                      backgroundColor: Customcolors
+                          .teal, // Customcolors.teal can be replaced with this for simplicity
+                      child: IconButton(
+                        icon: const Icon(Icons.notifications_outlined,
+                            color: Colors.white),
+                        onPressed: () {
+                          // Add notification logic here
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Notifications()));
+                        },
+                      ),
+                    ),
+                    if(unread_count > 0)
+                     Positioned(
+                      right: 10,
+                      bottom: -5,
+                      child: 
+                      Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle
+                        ),
+                        child: Text(
+                          unread_count.toString(),
+                          style: TextStyle(
+                            color: Colors.white
+                          ),
+                        ),
+                      ),),
+                    ]
                   ),
                 ),
               ],

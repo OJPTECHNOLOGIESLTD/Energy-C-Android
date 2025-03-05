@@ -16,7 +16,7 @@ static const String baseUrl = "https://backend.energychleen.ng/api";
 
 Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
   try {
-    final url = Uri.parse('$baseUrl/recycle-essentials');
+    final url = Uri.parse('$baseUrl/all/items');
     print('Requesting: $url');
 
     final response = await http.get(url).timeout(Duration(seconds: 10));
@@ -24,7 +24,11 @@ Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
     if (response.statusCode == 200) {
       print('items${response.body}');
       if (response.headers['content-type']?.contains('application/json') ?? false) {
-        List<dynamic> data = json.decode(response.body);
+        Map<String, dynamic> jsonResponse = json.decode(response.body);
+        
+        // Extract the list from the "data" field
+        List<dynamic> data = jsonResponse['data'];
+        
         return data.map((item) => RecycleEssentials.fromJson(item)).toList();
       } else {
         throw Exception('Invalid response format. Expected JSON.');
@@ -39,6 +43,7 @@ Future<List<RecycleEssentials>> fetchRecycleEssentials() async {
     throw Exception('Error fetching recycle-essentials: $e');
   }
 }
+
 
   @override
   Widget build(BuildContext context) {

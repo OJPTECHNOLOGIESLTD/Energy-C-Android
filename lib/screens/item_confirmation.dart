@@ -51,28 +51,34 @@ Future<void> _loadScheduleData() async {
           "Invalid cityId or stateId: cityId = $cityId, stateId = $stateId");
     }
 
-    int? categoryId = AuthController.instance.wasteDetails.value?.categoryId;
-    if (categoryId == null) {
-      throw Exception(
-          "categoryId is null. Ensure categoryId is set properly.");
-    }
+// int? categoryId = AuthController.instance.wasteDetails.value?.categoryId;
 
-    await ApiService.instance.createPost(
-      date: pickupDetails['pickupDate'],
-      address: pickupDetails['pickupAddress'],
-      cityId: cityId,
-      stateId: stateId,
-      pickupType: 'Home',//pickupDetails['pickupOption']
-      wasteItems: [
-        {
-          "waste_item_id": AuthController.instance.wasteDetails.value!.id,
-          "name": wasteItems['wasteType'],
-          "totalWeight": wasteDetails['weight']
-        },
-      ],
-      images: _imageFiles, 
-      videos: _videoFiles, context: context, 
-    );
+// // Debugging print statements to check values
+// print("wasteDetails: ${AuthController.instance.wasteDetails.value}");
+// print("categoryId: $categoryId");
+
+// if (categoryId == null) {
+//   throw Exception(
+//       "categoryId is null. Ensure categoryId is set properly.");
+// }
+
+await ApiService.instance.createPost(
+  date: pickupDetails['pickupDate'],
+  address: pickupDetails['pickupAddress'],
+  cityId: cityId,
+  stateId: stateId,
+  pickupType: 'Home', //pickupDetails['pickupOption']
+  wasteItems: [
+    {
+      "waste_item_id": AuthController.instance.wasteDetails.value!.id,
+      "name": wasteItems['wasteType'],
+      "totalWeight": wasteDetails['weight']
+    },
+  ],
+  images: _imageFiles,
+  videos: _videoFiles, context: context,
+);
+
 
     setState(() {
       isLoading = false; // End loading after successful completion

@@ -12,7 +12,7 @@ class OrderService {
   final String baseUrl = "https://backend.energychleen.ng/api"; // Replace with your API base URL
 
   Future<Map<String, dynamic>> cancelOrder(String orderId) async {
-    final url = Uri.parse("$baseUrl/orders/${AuthController.instance.userDetails.value!.id}/cancel/$orderId");
+    final url = Uri.parse("$baseUrl/orders/${AuthController.instance.userDetails.value!.id}/cancel/$orderId");//
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token')?.trim() ?? '';
 
@@ -388,64 +388,52 @@ class _OrderCardState extends State<OrderCard> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      color: Customcolors.offwhite,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Est. Weight:',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                          Text(
-                           '${ widget.quantity.toString()} kg',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Est. Weight:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                        Text(
+                         '${ widget.quantity.toString()} kg',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8,),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      color: Customcolors.offwhite,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Est. Income:',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                          Text(
-                            'NGN ${widget.estIncome.toString()}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Est. Income:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                        Text(
+                          'NGN ${widget.estIncome.toString()}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8,),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      color: Customcolors.offwhite,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Pickup Date:',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                          Text(
-                            widget.pickUpDate,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                        ],
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Pickup Date:',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                        Text(
+                          widget.pickUpDate,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8,),
                     // Address
@@ -464,31 +452,21 @@ class _OrderCardState extends State<OrderCard> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20,),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      color: Customcolors.offwhite,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Points to Gain:',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                          Text(
-                            '${widget.points}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
-                          ),
-                        ],
-                      ),
+                    SizedBox(height: 14,),
+                    if(widget.status =='Completed')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          '+ ${widget.points} points earned',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 16, color: Customcolors.teal),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 16),
-      
               // Cancel Request Button
               Visibility(
                 visible: widget.status == "Approved" || widget.status == "Pending",

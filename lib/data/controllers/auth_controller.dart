@@ -161,16 +161,17 @@ class AuthController extends GetxController {
         },
       );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        List<Order> orders = (responseData['orders'] as List)
-            .map((e) => Order.fromJson(e))
-            .toList();
-        print('Orders fetched successfully: ${orders.length}');
-        return orders;
-      } else {
-        print('Failed to fetch orders: ${response.statusCode}');
-      }
+     if (response.statusCode == 200 || response.statusCode == 201) {
+  final responseData = json.decode(response.body);
+  List<Order> orders = (responseData['orders'] as List)
+      .map((e) => Order.fromJson(e))
+      .toList();
+  print('Orders fetched successfully: ${orders.length}');
+  return orders;
+} else {
+  print('Failed to fetch orders: ${response.statusCode}');
+  print('Response body: ${response.body}');
+}
     } catch (e) {
       print('Error occurred while fetching orders: $e');
     }
@@ -366,38 +367,57 @@ class AuthController extends GetxController {
   }
 
   var wasteItems = <WasteItem>[].obs; // Store multiple waste items
-  Future<void> fetchWasteItems() async {
-    final url = Uri.parse("$baseUrl/waste-items");
+Future<void> fetchWasteItems() async {
+  final url = Uri.parse("$baseUrl/waste-items");
 
-    try {
-      final response = await http.get(url);
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+      },
+    );
 
-      if (response.statusCode == 200) {
-        print("Raw API Response: ${response.body}"); // Debugging step
+    if (response.statusCode == 200) {
+      print("Raw API Response: ${response.body}"); // Debugging step
 
-        final Map<String, dynamic> data = json.decode(response.body);
-        if (data['waste_items'] != null && data['waste_items'] is List) {
-          wasteItems.value = (data['waste_items'] as List)
-              .map((e) => WasteItem.fromJson(e))
-              .toList();
-          print("Waste items fetched: ${wasteItems.length}");
+      final Map<String, dynamic> data = json.decode(response.body);
 
-          // Set the first waste item as the selected one (wasteDetails)
-          if (wasteItems.isNotEmpty) {
-            wasteDetails.value = wasteItems.first; // Assign the first item
-          } else {
-            wasteDetails.value = null; // Handle empty case
+      // Check if waste_items exists and is a List
+      if (data['waste_items'] != null && data['waste_items'] is List) {
+        // Log the waste_items content for debugging
+        print("Parsed waste_items: ${data['waste_items']}");
+
+        // Safely map and decode each waste item
+        wasteItems.value = (data['waste_items'] as List).map((e) {
+          try {
+            return WasteItem.fromJson(e);
+          } catch (error) {
+            print("Error parsing waste item: $error, item: $e");
+            return null; // Return null in case of error
           }
+        }).where((item) => item != null).cast<WasteItem>().toList(); // Filter out null items
+
+        print("Waste items fetched: ${wasteItems.length}");
+
+        // Set the first waste item as the selected one (wasteDetails)
+        if (wasteItems.isNotEmpty) {
+          wasteDetails.value = wasteItems.first; // Assign the first item
         } else {
-          print("No waste items found.");
+          wasteDetails.value = null; // Handle empty case
         }
       } else {
-        print("Failed to load waste items: ${response.statusCode}");
+        print("No waste items found or 'waste_items' is not a list.");
       }
-    } catch (e) {
-      print("Error fetching waste items: $e");
+    } else {
+      print("Failed to load waste items: ${response.statusCode}");
+      print('Response body: ${response.body}');
     }
+  } catch (e) {
+    print("Error fetching waste items: $e");
   }
+}
+
 
   void updateWasteWeight(int newWeight) {
     if (wasteDetails.value != null && newWeight > 0) {

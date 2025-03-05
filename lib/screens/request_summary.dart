@@ -1,5 +1,3 @@
-import 'package:energy_chleen/data/controllers/auth_controller.dart';
-import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/home_pickup.dart';
 import 'package:energy_chleen/screens/item_confirmation.dart';
 import 'package:energy_chleen/screens/wastes/waste_info.dart';
@@ -7,7 +5,6 @@ import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RequestSummary extends StatefulWidget {
   const RequestSummary({super.key});

@@ -271,11 +271,11 @@ class WasteItem {
   final String? category;
   final double price;
   double weight;
-  final String? image;
-  final String? video;
+  final List<String> image;
+  final List<String> video;
   final String? description;
   final int? orderId;
-  final int categoryId;
+  final int? categoryId;
   final List<Instruction> instructions;
 
   WasteItem({
@@ -284,11 +284,11 @@ class WasteItem {
     this.category,
     required this.price,
     required this.weight,
-    this.image,
-    this.video,
+    required this.image,
+    required this.video,
     this.description,
     this.orderId,
-    required this.categoryId,
+    this.categoryId,
     required this.instructions,
   });
 
@@ -296,18 +296,19 @@ class WasteItem {
     return WasteItem(
       id: json['id'] ?? 0,
       name: json['name'] ?? 'Unknown',
-      category: json['category'] is String ? json['category'] : null,
-      description: json['description'] is String ? json['description'] : null,
+      category: json['category'] as String?,
+      description: json['description'] as String?,
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       weight: (json['weight'] as num?)?.toDouble() ?? 0.0,
-      image: json['image'] is String ? json['image'] : json['image']?.toString(),
-      video: json['video'] is String ? json['video'] : json['video']?.toString(),
-      orderId: json['orderId'] is int ? json['orderId'] : null,
-      categoryId: json['category_id'] is int ? json['category_id'] : 0, // default to 0 if null
-      instructions: (json['instructions'] as List?)
-              ?.map((e) => Instruction.fromJson(e))
-              .toList() ??
-          [],
+      image: json['image'] is List ? List<String>.from(json['image']) : [],  // Safely handle image as list
+      video: json['video'] is List ? List<String>.from(json['video']) : [],  // Safely handle video as list
+      orderId: json['orderId'] as int?,
+      categoryId: json['category_id'] as int?,
+      instructions: json['instructions'] is List
+          ? (json['instructions'] as List)
+              .map((e) => Instruction.fromJson(e))
+              .toList()
+          : [],  // Safely handle instructions as list
     );
   }
 
@@ -327,6 +328,7 @@ class WasteItem {
     };
   }
 }
+
 
 class Instruction {
   final int id;
@@ -464,5 +466,41 @@ class PurchaseModel {
       'quantity': quantity,
       'total_price': total_price,
     };
+  }
+}
+
+class Message {
+  final int id;
+  final int adminId;
+  final int? receiverId; // Nullable for broadcast messages
+  final String senderName;
+  final String message;
+  int isRead;
+  final DateTime createdAt;
+
+  Message({
+    required this.id,
+    required this.adminId,
+    required this.receiverId,
+    required this.senderName,
+    required this.message,
+    required this.isRead,
+    required this.createdAt,
+  });
+
+  factory Message.fromJson(Map<String, dynamic> json) {
+    return Message(
+      id: json['id'],
+      adminId: json['admin_id'],
+      receiverId: json['receiver_id'], // Can be null
+      senderName: json['sender_name'],
+      message: json['message'],
+      isRead: json['is_read'],
+      createdAt: DateTime.parse(json['created_at']),
+    );
+  }
+
+  void markAsRead(){
+    isRead=1;
   }
 }

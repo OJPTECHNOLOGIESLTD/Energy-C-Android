@@ -6,7 +6,6 @@ import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RecyclingPage extends StatefulWidget {
   final bool actionType1;
@@ -146,12 +145,10 @@ await storageService.saveWasteDetails(
                               SizedBox(height: 8),
                               // TipsWidget(wasteType: wasteDetails.description),
                               Text(
-                                wasteDetails.instructions
-                                    .map((instruction) =>
-                                        instruction.description)
-                                    .join(', '), // Joining with commas
-                                style: TextStyle(fontSize: 14),
-                              ),
+  wasteDetails.instructions.join(', '), // Joining with commas
+  style: TextStyle(fontSize: 14),
+),
+
 
                               SizedBox(height: 24),
 

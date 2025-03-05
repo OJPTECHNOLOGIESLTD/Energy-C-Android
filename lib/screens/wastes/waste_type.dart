@@ -72,17 +72,21 @@ class WasteTypesPage extends StatelessWidget {
       child: Card(
         child: ListTile(
           leading: Image.network(
-                wasteItem.image ?? 'https://via.placeholder.com/150',
-                width: 50,
-                height: 50,
-                fit:  BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/Recycle-bin-green.png', // Local placeholder image
-                    width: MediaQuery.of(context).size.width * 0.4,
-                  );
-                },
-              ),
+  wasteItem.image.isNotEmpty ? wasteItem.image[0] : 'https://via.placeholder.com/150',  // Extracting the first image URL if available
+  width: 50,
+  height: 50,
+  fit: BoxFit.cover,
+  errorBuilder: (context, error, stackTrace) {
+    return SizedBox(
+      width: 50,
+      child: Image.asset(
+        'assets/Recycle-bin-green.png',  // Local placeholder image
+        width: MediaQuery.of(context).size.width * 0.4,
+      ),
+    );
+  },
+),
+
           title: Text(wasteItem.name),
           trailing: Text(wasteItem.price.toString()),
         ),
@@ -112,7 +116,7 @@ class WasteTypesPage extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => RecyclingPage(
           wasteType: wasteItem.name,
-          actionType1: true,
+          actionType1: false,
         ),
       ),
     );

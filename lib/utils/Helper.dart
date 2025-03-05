@@ -311,6 +311,7 @@ class RecyclingScheduleProgress extends StatelessWidget {
     );
   }
 }
+
 class ShimmerEffects extends StatelessWidget {
   final double height; 
 

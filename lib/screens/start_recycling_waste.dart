@@ -98,18 +98,19 @@ class PageviewItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                wasteItem.image ?? 'https://via.placeholder.com/150',
-                width: MediaQuery.of(context).size.width * 0.4,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/Recycle-bin-green.png', // Local placeholder image
-                    width: MediaQuery.of(context).size.width * 0.4,
-                  );
-                },
-              ),
-            ),
+  borderRadius: BorderRadius.circular(16),
+  child: Image.network(
+    wasteItem.image.isNotEmpty ? wasteItem.image[0] : 'https://via.placeholder.com/150',  // Extract first image URL
+    width: MediaQuery.of(context).size.width * 0.4,
+    errorBuilder: (context, error, stackTrace) {
+      return Image.asset(
+        'assets/Recycle-bin-green.png', // Local placeholder image
+        width: MediaQuery.of(context).size.width * 0.4,
+      );
+    },
+  ),
+),
+
             Container(
               margin: const EdgeInsets.only(top: 10),
               width: MediaQuery.of(context).size.width * 0.5,
