@@ -292,25 +292,34 @@ class WasteItem {
     required this.instructions,
   });
 
-  factory WasteItem.fromJson(Map<String, dynamic> json) {
-    return WasteItem(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? 'Unknown',
-      category: json['category'] as String?,
-      description: json['description'] as String?,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      weight: (json['weight'] as num?)?.toDouble() ?? 0.0,
-      image: json['image'] is List ? List<String>.from(json['image']) : [],  // Safely handle image as list
-      video: json['video'] is List ? List<String>.from(json['video']) : [],  // Safely handle video as list
-      orderId: json['orderId'] as int?,
-      categoryId: json['category_id'] as int?,
-      instructions: json['instructions'] is List
-          ? (json['instructions'] as List)
-              .map((e) => Instruction.fromJson(e))
-              .toList()
-          : [],  // Safely handle instructions as list
-    );
-  }
+factory WasteItem.fromJson(Map<String, dynamic> json) {
+  return WasteItem(
+    id: json['id'] ?? 0,
+    name: json['name'] ?? 'Unknown',
+    category: json['category'] as String?,
+    description: json['description'] as String?,
+    price: (json['price'] as num?)?.toDouble() ?? 0.0,
+    weight: (json['weight'] as num?)?.toDouble() ?? 0.0,
+    image: json['image'] is List ? List<String>.from(json['image']) : [],  // Safely handle image as list
+    video: json['video'] is List ? List<String>.from(json['video']) : [],  // Safely handle video as list
+    orderId: json['orderId'] as int?,
+    categoryId: json['category_id'] as int?,
+    instructions: json['instructions'] is List
+        ? (json['instructions'] as List).map((e) {
+            if (e is String) {
+              // Handle when instructions is a list of strings
+              return Instruction(description: e);
+            } else if (e is Map<String, dynamic>) {
+              // Handle when instructions are objects
+              return Instruction.fromJson(e);
+            } else {
+              throw 'Invalid instruction format';
+            }
+          }).toList()
+        : [],  // Safely handle instructions as list
+  );
+}
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -331,29 +340,19 @@ class WasteItem {
 
 
 class Instruction {
-  final int id;
-  final int wasteItemId;
   final String description;
 
-  Instruction({
-    required this.id,
-    required this.wasteItemId,
-    required this.description,
-  });
+  Instruction({required this.description});
 
   factory Instruction.fromJson(Map<String, dynamic> json) {
     return Instruction(
-      id: json['id'] ?? 0,
-      wasteItemId: json['waste_item_id'] ?? 0,
-      description: json['description'] ?? 'No instruction',
+      description: json['description'] ?? 'No description',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
-      "waste_item_id": wasteItemId,
-      "description": description,
+      'description': description,
     };
   }
 }

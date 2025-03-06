@@ -178,12 +178,23 @@ Future<void> _takePhoto() async {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Take Photos 4 photos'),
+                    Text('Capture Your Waste Items', style: TextStyle(fontSize: 22,
+                    fontWeight: FontWeight.bold),),
+SizedBox(
+                      height: 10,
+                    ),
+                    Text('To complete your pickup request, please take live photos of [4] waste types as in the pickup summary. '),
                     SizedBox(
                       height: 20,
                     ),
           
-                    Text('⚠ Important'),
+                    Text('⚠ Important', style: TextStyle(fontSize: 20,
+                    fontWeight: FontWeight.bold),),
+SizedBox(
+                      height: 10,
+                    ),
+
+                    Text('1. Ensure the images clearly show the waste items for accurate classification.\n2. Take one photo per waste type and confirm before moving to the next.\n\nThank you for helping us maintain transparency and efficiency in our recycling process!'),
                     SizedBox(
                       height: 20,
                     ),
@@ -307,7 +318,7 @@ Future<void> _takePhoto() async {
 
                     // Show the Finish button only if 4 photos are taken
                     Visibility(
-                      visible: _imageFiles.length >= 2,
+                      visible: _imageFiles.length >= 4,
                       child: GestureDetector(
                         onTap: () {
                           // Handle finish action
@@ -319,7 +330,9 @@ Future<void> _takePhoto() async {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
                               color: Customcolors.teal),
-                          child: Text(
+                          child: isLoading ? Center(child:
+                          CircularProgressIndicator())
+                          :Text(
                             textAlign: TextAlign.center,
                             'Finish',
                             style: TextStyle(

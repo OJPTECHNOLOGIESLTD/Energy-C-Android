@@ -22,11 +22,6 @@ class _StationPickupDetailsState extends State<StationPickupDetails> {
       'pickupAddress': '5678 orchid road',
       'isSelectedLocation': false,
     },
-    {
-      'pickupState': 'lagos',
-      'pickupAddress': '5678 orchid road',
-      'isSelectedLocation': false,
-    },
     // More stations
   ];
 

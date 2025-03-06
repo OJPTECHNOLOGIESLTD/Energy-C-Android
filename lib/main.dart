@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: "/signup", page: ()=>Signup()),
       ],
       title: 'Energy Chleen',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Customcolors.teal),
         useMaterial3: true,

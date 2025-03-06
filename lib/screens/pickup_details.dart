@@ -31,7 +31,6 @@ Future<void> _savePickupSelection() async {
 }
 @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _savePickupSelection();
   }

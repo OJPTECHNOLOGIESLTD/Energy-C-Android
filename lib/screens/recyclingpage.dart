@@ -51,7 +51,8 @@ class _RecyclingPageState extends State<RecyclingPage> {
       );
       return;
     }
-
+    print('Waste type saved: ${widget.wasteType}');
+    await StorageService().saveWasteItem(wasteType: widget.wasteType);
     final wasteDetails = authController.wasteDetails.value!;
 await storageService.saveWasteDetails(
   weight: wasteDetails.weight.toInt(), // Weight in some unit
@@ -68,7 +69,6 @@ await storageService.saveWasteDetails(
     print(
         'waste ${wasteDetails.name}, weight ${wasteDetails.weight}, est. price ${wasteDetails.weight * wasteDetails.price}');
   }
-
 
 
   @override

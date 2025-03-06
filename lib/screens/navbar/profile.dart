@@ -1,6 +1,5 @@
 import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/news_and_event.dart';
-import 'package:energy_chleen/screens/my_points.dart';
 import 'package:energy_chleen/screens/wastes/waste_type.dart';
 import 'package:energy_chleen/term_and_policy.dart';
 import 'package:energy_chleen/utils/Helper.dart';

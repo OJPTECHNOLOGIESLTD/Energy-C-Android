@@ -3,7 +3,6 @@ import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/recyclingpage.dart';
 import 'package:energy_chleen/screens/wastes/waste_type.dart';
 import 'package:energy_chleen/utils/Helper.dart';
-import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -142,7 +141,7 @@ class PageviewItem extends StatelessWidget {
   }
 
   void _navigateToRecyclingPage(BuildContext context, WasteItem wasteItem) {
-    _saveWasteItemName(wasteItem);
+    // _saveWasteItemName(wasteItem);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -155,9 +154,9 @@ class PageviewItem extends StatelessWidget {
     print("Navigating to recycling page with waste type: ${wasteItem.name}");
   }
 }
-  Future<void> _saveWasteItemName(WasteItem wasteItem) async {
-    print('Waste type saved: ${wasteItem.name}');
-    await StorageService().saveWasteItem(wasteType: wasteItem.name
+//   Future<void> _saveWasteItemName(WasteItem wasteItem) async {
+//     print('Waste type saved: ${wasteItem.name}');
+//     await StorageService().saveWasteItem(wasteType: wasteItem.name
 
-);
-  }
+// );
+//   }
