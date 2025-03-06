@@ -2,6 +2,7 @@ import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/news_and_event.dart';
 import 'package:energy_chleen/screens/my_points.dart';
 import 'package:energy_chleen/screens/wastes/waste_type.dart';
+import 'package:energy_chleen/term_and_policy.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -120,10 +121,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   icon: Icons.star_rate,
                   title: 'Rate App',
                   onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MyPointsPage()));
+                  //   Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //           builder: (context) => MyPointsPage()));
                   },
                 ),
                 Padding(
@@ -139,7 +140,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   context,
                   icon: Icons.rule,
                   title: 'Terms & Conditions',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context)=>TermsAndPolicy()));
+                  },
                 ),
                 _buildListTile(
                   context,
@@ -162,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Version 2.0',
+                  'Version 1.0',
                   style: TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 10),
@@ -197,11 +201,8 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => AuthController.instance.logout(),
-                //           Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => Signup()),
-                // ),
+                onPressed: () => AuthController.instance.deleteUser(),
+                
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   shape: RoundedRectangleBorder(

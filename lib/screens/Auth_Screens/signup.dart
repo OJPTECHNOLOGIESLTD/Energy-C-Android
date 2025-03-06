@@ -1,5 +1,6 @@
 import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/screens/Auth_Screens/login.dart';
+import 'package:energy_chleen/term_and_policy.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -216,6 +217,15 @@ class _SignupState extends State<Signup> {
                                   style: TextStyle(
                                       color: Customcolors.yellow,
                                       fontWeight: FontWeight.bold),
+                                      recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // Handle tap on Terms of Use
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TermsAndPolicy()),
+                                );
+                              },
                                   // You can add a gesture recognizer to handle taps on the Privacy Policy
                                 ),
                                 TextSpan(
@@ -227,6 +237,15 @@ class _SignupState extends State<Signup> {
                                   style: TextStyle(
                                       color: Customcolors.yellow,
                                       fontWeight: FontWeight.bold),
+                                      recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // Handle tap on Terms of Use
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TermsAndPolicy()),
+                                );
+                              },
                                   // You can add a gesture recognizer to handle taps on the Terms of Use
                                 ),
                               ],

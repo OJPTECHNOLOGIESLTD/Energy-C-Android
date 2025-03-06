@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:energy_chleen/data/controllers/api_service.dart';
 import 'package:energy_chleen/data/controllers/auth_controller.dart';
 import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/utils/Helper.dart';
@@ -9,32 +8,36 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderService {
-  final String baseUrl = "https://backend.energychleen.ng/api"; // Replace with your API base URL
+  final String baseUrl =
+      "https://backend.energychleen.ng/api"; // Replace with your API base URL
 
   Future<Map<String, dynamic>> cancelOrder(String orderId) async {
-    final url = Uri.parse("$baseUrl/orders/${AuthController.instance.userDetails.value!.id}/cancel/$orderId");//
+    final url = Uri.parse(
+        "$baseUrl/orders/${AuthController.instance.userDetails.value!.id}/cancel/$orderId"); //
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token')?.trim() ?? '';
 
     print("Token: Bearer $token"); // Check the full token format
 
     try {
-      final response = await http.post(url, headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $token", // Correctly formatted with "Bearer"
-        "Accept": "application/json",
-      }, body: jsonEncode({
-        "orderId": orderId, // Include orderId in the request body
-      }));
+      final response = await http.post(url,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization":
+                "Bearer $token", // Correctly formatted with "Bearer"
+            "Accept": "application/json",
+          },
+          body: jsonEncode({
+            "orderId": orderId, // Include orderId in the request body
+          }));
 
       print("Response Status Code: ${response.statusCode}");
       print("Response Body: ${response.body}");
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         Get.snackbar("Success", 'Order ${orderId} been successfully canceled',
-          backgroundColor: Customcolors.teal, colorText: Customcolors.white);
+            backgroundColor: Customcolors.teal, colorText: Customcolors.white);
         return jsonDecode(response.body);
-          
       } else {
         return {
           "error": "Failed to cancel order",
@@ -47,7 +50,6 @@ class OrderService {
     }
   }
 }
-
 
 class OrdersPage extends StatefulWidget {
   @override
@@ -149,88 +151,106 @@ class _OrdersPageState extends State<OrdersPage> {
               ),
               SizedBox(height: 16),
 
-FutureBuilder<List<Order>>(
-  future: AuthController.instance.fetchOrders(
-    AuthController.instance.userDetails.value!.id,
-  ),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return ShimmerEffects(height: 0.7);
-    } else if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}'));
-    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-      return Center(child: Text('Nothing to see here.',
-      style: TextStyle(color: Colors.black),));
-    } else {
-      return Expanded(
-        child: ListView.builder(
-          itemCount: snapshot.data!.length,
-          itemBuilder: (context, index) {
-            final order = snapshot.data![index];
+              FutureBuilder<List<Order>>(
+                future: AuthController.instance.fetchOrders(
+                  AuthController.instance.userDetails.value!.id,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return ShimmerEffects(height: 0.7);
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                        child: Text(
+                      'Nothing to see here.',
+                      style: TextStyle(color: Colors.black),
+                    ));
+                  } else {
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          final order = snapshot.data![index];
 
-            if (approved && order.status == 'Approved') {
-              return OrderCard(
-  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
-  orderId: order.orderId,
-  status: order.status,
-  quantity: order.totalWeight,
-  estIncome: order.totalPrice,
-  pickUpDate: order.date,
-  address: order.address,
-  cityName: order.cityId,
-  stateName: order.stateId,
-  points: order.point,
+                          if (approved && order.status == 'Approved') {
+                            return OrderCard(
+                              materialType: order.wasteItems
+                                  .map((item) => item.category)
+                                  .join(', '), // Join names of waste items
+                              orderId: order.orderId,
+                              status: order.status,
+                              quantity: order.totalWeight,
+                              estIncome: order.totalPrice,
+                              pickUpDate: order.date,
+                              address: order.address,
+                              cityName: AuthController.instance.getCityName(order
+                                  .cityId), // Get city name from backend data
+                              stateName: AuthController.instance.getStateName(order
+                                  .stateId), // Get state name from backend data
+                              points: order.point,
+                            );
+                          } else if (pending && order.status == 'Pending') {
+                            return OrderCard(
+                              materialType: order.wasteItems
+                                  .map((item) => item.name)
+                                  .join(', '), // Join names of waste items
+                              orderId: order.orderId,
+                              status: order.status,
+                              quantity: order.totalWeight,
+                              estIncome: order.totalPrice,
+                              pickUpDate: order.date,
+                              address: order.address,
+                              cityName: AuthController.instance
+                                  .getCityName(order.cityId),
+                              stateName: AuthController.instance
+                                  .getStateName(order.stateId),
+                              points: order.point,
+                            );
+                          } else if (cancelled && order.status == 'Canceled') {
+                            return OrderCard(
+                              materialType: order.wasteItems
+                                  .map((item) => item.category)
+                                  .join(', '),
+                              orderId: order.orderId,
+                              status: order.status,
+                              quantity: order.totalWeight,
+                              estIncome: order.totalPrice,
+                              pickUpDate: order.date,
+                              address: order.address,
+                              cityName: AuthController.instance
+                                  .getCityName(order.cityId),
+                              stateName: AuthController.instance
+                                  .getStateName(order.stateId),
+                              points: order.point,
+                            );
+                          } else if (completed && order.status == 'Completed') {
+                            return OrderCard(
+                              materialType: order.wasteItems
+                                  .map((item) => item.category)
+                                  .join(', '), // Join names of waste items
+                              orderId: order.orderId,
+                              status: order.status,
+                              quantity: order.totalWeight,
+                              estIncome: order.totalPrice,
+                              pickUpDate: order.date,
+                              address: order.address,
+                              cityName: AuthController.instance.getCityName(order
+                                  .cityId), // Get city name from backend data
+                              stateName: AuthController.instance.getStateName(order
+                                  .stateId), // Get state name from backend data
+                              points: order.point,
+                            );
+                          }
 
-              );
-            } else if (pending && order.status == 'Pending') {
-              return OrderCard(
-  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
-  orderId: order.orderId,
-  status: order.status,
-  quantity: order.totalWeight,
-  estIncome: order.totalPrice,
-  pickUpDate: order.date,
-  address: order.address,
-  cityName: order.cityId,
-  stateName: order.stateId,
-  points: order.point,
-);
-            } else if (cancelled && order.status == 'Canceled') {
-              return OrderCard(
-  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
-  orderId: order.orderId,
-  status: order.status,
-  quantity: order.totalWeight,
-  estIncome: order.totalPrice,
-  pickUpDate: order.date,
-  address: order.address,
-  cityName: order.cityId,
-  stateName: order.stateId,
-  points: order.point,
-);
-            }else if (completed && order.status == 'Completed') {
-              return OrderCard(
-  materialType: order.wasteItems.map((item) => item.category).join(', '), // Join names of waste items
-  orderId: order.orderId,
-  status: order.status,
-  quantity: order.totalWeight,
-  estIncome: order.totalPrice,
-  pickUpDate: order.date,
-  address: order.address,
-  cityName: order.cityId,
-  stateName: order.stateId,
-  points: order.point,
-);
-            }
-
-            // If no order matches, return empty container
-            return SizedBox.shrink( );
-          },
-        ),
-      );
-    }
-  },
-),
+                          // If no order matches, return empty container
+                          return SizedBox.shrink();
+                        },
+                      ),
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -249,7 +269,6 @@ class TabButton extends StatelessWidget {
     required this.isActive,
     required this.onTap,
   });
-  
 
   @override
   Widget build(BuildContext context) {
@@ -279,8 +298,8 @@ class OrderCard extends StatefulWidget {
   final double estIncome;
   final String pickUpDate;
   final String address;
-  final int cityName;
-  final int stateName;
+  final String cityName;
+  final String stateName;
   final double points;
 
   const OrderCard({
@@ -292,7 +311,8 @@ class OrderCard extends StatefulWidget {
     required this.pickUpDate,
     required this.address,
     required this.cityName,
-    required this.stateName, required this.points,
+    required this.stateName,
+    required this.points,
   });
 
   @override
@@ -352,7 +372,8 @@ class _OrderCardState extends State<OrderCard> {
                     child: Text(
                       widget.materialType,
                       style: TextStyle(
-                          fontWeight: FontWeight.w500, color: Customcolors.white),
+                          fontWeight: FontWeight.w500,
+                          color: Customcolors.white),
                     ),
                   ),
                   Column(
@@ -360,7 +381,7 @@ class _OrderCardState extends State<OrderCard> {
                     children: [
                       Text(widget.orderId.toString(),
                           style: TextStyle(fontWeight: FontWeight.bold)),
-      
+
                       // Status
                       Text(
                         widget.status,
@@ -381,7 +402,7 @@ class _OrderCardState extends State<OrderCard> {
                   ),
                 ],
               ),
-      
+
               // Estimated Weight and Income
               Container(
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -397,13 +418,15 @@ class _OrderCardState extends State<OrderCard> {
                               fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                         Text(
-                         '${ widget.quantity.toString()} kg',
+                          '${widget.quantity.toString()} kg',
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                       ],
                     ),
-                    SizedBox(height: 8,),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -419,7 +442,9 @@ class _OrderCardState extends State<OrderCard> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8,),
+                    SizedBox(
+                      height: 8,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -435,7 +460,9 @@ class _OrderCardState extends State<OrderCard> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 8,),
+                    SizedBox(
+                      height: 8,
+                    ),
                     // Address
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -445,75 +472,88 @@ class _OrderCardState extends State<OrderCard> {
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 16),
                         ),
-                        Text(
-                          '${widget.address} ${widget.cityName} ${widget.stateName}',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16),
+                        SizedBox(
+                          width: 250,
+                          child: Text(
+                            textAlign: TextAlign.right,
+                            overflow: TextOverflow.ellipsis,
+                            '${widget.address} ${widget.cityName} ${widget.stateName}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500, fontSize: 16),
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 14,),
-                    if(widget.status =='Completed')
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '+ ${widget.points} points earned',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16, color: Customcolors.teal),
-                        ),
-                      ],
+                    SizedBox(
+                      height: 14,
                     ),
+                    if (widget.status == 'Completed')
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            '+ ${widget.points} points earned',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Customcolors.teal),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),
               // Cancel Request Button
               Visibility(
-                visible: widget.status == "Approved" || widget.status == "Pending",
+                visible:
+                    widget.status == "Approved" || widget.status == "Pending",
                 child: Align(
                   alignment: Alignment.center,
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (widget.status == 'Approved' || widget.status =='Pending') {
-                         cancelUserOrder(); 
-                        }else{
-                          ApiService.instance.createPost(context: context, 
-                          date: widget.pickUpDate,
-                          address: widget.address,
-                          cityId: widget.cityName,
-                          stateId: widget.stateName,
-                          pickupType: widget.materialType,
-                          wasteItems: [], images: [], videos: []);
-      
-                          print('Rescheduling..');
-                        }
-                        
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        backgroundColor: Customcolors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
+                        onPressed: () {
+                          if (widget.status == 'Approved' ||
+                              widget.status == 'Pending') {
+                            cancelUserOrder();
+                          } else {
+                            // ApiService.instance.createPost(
+                            //     context: context,
+                            //     date: widget.pickUpDate,
+                            //     address: widget.address,
+                            //     cityId: widget.cityName,
+                            //     stateId: widget.stateName,
+                            //     pickupType: widget.materialType,
+                            //     wasteItems: [],
+                            //     images: [],
+                            //     videos: []);
+
+                            print('Rescheduling..');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          backgroundColor: Customcolors.teal,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
                         ),
-                      ),
-                      child:
-                      //  widget.status == 'Approved' || widget.status =='Pending'
-                          // ? 
-                          Text(
-                              'Cancel Request',
-                              style: TextStyle(
-                                  color: Customcolors.white,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          // : Text(
-                          //     'Reschedule',
-                          //     style: TextStyle(
-                          //         color: Customcolors.white,
-                          //         fontWeight: FontWeight.bold),
-                          //   ),
-                    ),
+                        child:
+                            //  widget.status == 'Approved' || widget.status =='Pending'
+                            // ?
+                            Text(
+                          'Cancel Request',
+                          style: TextStyle(
+                              color: Customcolors.white,
+                              fontWeight: FontWeight.bold),
+                        )
+                        // : Text(
+                        //     'Reschedule',
+                        //     style: TextStyle(
+                        //         color: Customcolors.white,
+                        //         fontWeight: FontWeight.bold),
+                        //   ),
+                        ),
                   ),
                 ),
               ),

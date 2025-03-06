@@ -51,17 +51,6 @@ Future<void> _loadScheduleData() async {
           "Invalid cityId or stateId: cityId = $cityId, stateId = $stateId");
     }
 
-// int? categoryId = AuthController.instance.wasteDetails.value?.categoryId;
-
-// // Debugging print statements to check values
-// print("wasteDetails: ${AuthController.instance.wasteDetails.value}");
-// print("categoryId: $categoryId");
-
-// if (categoryId == null) {
-//   throw Exception(
-//       "categoryId is null. Ensure categoryId is set properly.");
-// }
-
 await ApiService.instance.createPost(
   date: pickupDetails['pickupDate'],
   address: pickupDetails['pickupAddress'],

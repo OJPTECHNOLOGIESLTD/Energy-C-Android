@@ -93,7 +93,7 @@ Future<void> createPost({
   dioInstance.interceptors.add(CookieManager(CookieJar()));
 
   // Define the API URL
-  final url = '$baseUrl/orders/create/${AuthController.instance.userDetails.value!.id}'; // Full URL
+  final url = 'https://backend.energychleen.ng/api/users/${AuthController.instance.userDetails.value!.id}/orders'; // Full URL
 
   // Get token from SharedPreferences
   final prefs = await SharedPreferences.getInstance();
@@ -103,7 +103,7 @@ Future<void> createPost({
   final headers = {
     'Content-Type': 'multipart/form-data', // Important for file uploads
     'Authorization': 'Bearer $token',
-    'Accept': 'application/json',  // Added Accept header
+    'accept': 'application/json',  // Added Accept header
   };
 
   // Ensure pickupType is valid
@@ -151,7 +151,7 @@ Future<void> createPost({
     print('Response headers: ${response.headers}');
     print('Response body: ${response.data}');
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
+    if (response.statusCode == 201) {
       print('Data posted successfully');
      Navigator.push(
   context,
@@ -173,6 +173,8 @@ Future<void> createPost({
     }
   }
 }
+
+
 
 Future<List<Message>> fetchMessages() async {
     final url = Uri.parse("$baseUrl/user/${AuthController.instance.userDetails.value!.id}/messages");

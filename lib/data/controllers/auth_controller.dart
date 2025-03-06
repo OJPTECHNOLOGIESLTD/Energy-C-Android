@@ -16,8 +16,8 @@ class AuthController extends GetxController {
   Rx<LevelProgress?> progressDetails = Rx<LevelProgress?>(null);
   Rx<PurchaseModel?> purchasedModel = Rx<PurchaseModel?>(null);
   Rx<WasteItem?> wasteDetails = Rx<WasteItem?>(null);
-  RxList<CityName> cities = RxList<CityName>([]); // A reactive list of cities
-  RxList<StateData> states = RxList<StateData>([]);
+  // RxList<CityName> cities = RxList<CityName>([]); // A reactive list of cities
+  // RxList<StateData> states = RxList<StateData>([]);
 
   final String baseUrl = "https://backend.energychleen.ng/api";
 
@@ -151,6 +151,24 @@ class AuthController extends GetxController {
     }
   }
 
+  // Method to get waste name by ID
+RxList<WasteItem> wasteItemName = <WasteItem>[].obs;
+
+String getWasteName(int wasteItemId) {
+  return wasteItemName.firstWhere(
+    (wasteItem) => wasteItem.id == wasteItemId,
+    orElse: () => WasteItem(
+      id: 0,
+      name: 'Unknown', 
+      price: 0, // Default value
+      weight: 0, // Default value
+      image: [], // Default empty list
+      video: [], // Default empty list
+      instructions: [] // Default empty list
+    ),
+  ).name;
+}
+
   Future<List<Order>> fetchOrders(int userId) async {
     try {
       final response = await http.get(
@@ -160,18 +178,18 @@ class AuthController extends GetxController {
           'Authorization': 'Bearer ${token.value}',
         },
       );
-
-     if (response.statusCode == 200 || response.statusCode == 201) {
-  final responseData = json.decode(response.body);
-  List<Order> orders = (responseData['orders'] as List)
-      .map((e) => Order.fromJson(e))
-      .toList();
-  print('Orders fetched successfully: ${orders.length}');
-  return orders;
-} else {
-  print('Failed to fetch orders: ${response.statusCode}');
-  print('Response body: ${response.body}');
-}
+print('${response.body}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(response.body);
+        List<Order> orders = (responseData['orders'] as List)
+            .map((e) => Order.fromJson(e))
+            .toList();
+        print('Orders fetched successfully: ${orders.length}');
+        return orders;
+      } else {
+        print('Failed to fetch orders: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
     } catch (e) {
       print('Error occurred while fetching orders: $e');
     }
@@ -186,8 +204,10 @@ class AuthController extends GetxController {
     }
 
     // final id = userDetails.value!.id;
-    final url = Uri.parse("$baseUrl/${AuthController.instance.userDetails.value?.id}/level-progress");
- print('my create order Url: ${AuthController.instance.userDetails.value?.id}');
+    final url = Uri.parse(
+        "$baseUrl/${AuthController.instance.userDetails.value?.id}/level-progress");
+    print(
+        'my create order Url: ${AuthController.instance.userDetails.value?.id}');
     try {
       final response = await http.get(url);
 
@@ -207,6 +227,25 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       print("Error fetching data: $e");
+    }
+  }
+
+  Future<bool> deleteUser() async {
+    final url = Uri.parse("$baseUrl/user/${userDetails.value!.id}");
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        Get.snackbar("Success", "Account deleted successfully!",
+            backgroundColor: Customcolors.green, colorText: Customcolors.white);
+        await logout();
+        return true; // Successfully deleted
+      } else {
+        throw Exception("Failed to delete user");
+      }
+    } catch (e) {
+      throw Exception("Error: $e");
     }
   }
 
@@ -231,7 +270,6 @@ class AuthController extends GetxController {
       await fetchUser(); // Fetch user details if logged in
       await fetchStates();
       await fetchCities();
-      
     }
   }
 
@@ -268,16 +306,16 @@ class AuthController extends GetxController {
   }
 
   Future<void> loadToken() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? savedToken = prefs.getString('token');
-  
-  if (savedToken != null && savedToken.isNotEmpty) {
-    token.value = savedToken;
-    print("Loaded token: $savedToken");
-  } else {
-    print("No token found.");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedToken = prefs.getString('token');
+
+    if (savedToken != null && savedToken.isNotEmpty) {
+      token.value = savedToken;
+      print("Loaded token: $savedToken");
+    } else {
+      print("No token found.");
+    }
   }
-}
 
   Future<void> _makePostRequest({
     required String endpoint,
@@ -367,57 +405,60 @@ class AuthController extends GetxController {
   }
 
   var wasteItems = <WasteItem>[].obs; // Store multiple waste items
-Future<void> fetchWasteItems() async {
-  final url = Uri.parse("$baseUrl/waste-items");
+  Future<void> fetchWasteItems() async {
+    final url = Uri.parse("$baseUrl/waste-items");
 
-  try {
-    final response = await http.get(
-      url,
-      headers: {
-        'Accept': 'application/json',
-      },
-    );
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      print("Raw API Response: ${response.body}"); // Debugging step
+      if (response.statusCode == 200) {
+        print("Raw API Response: ${response.body}"); // Debugging step
 
-      final Map<String, dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = json.decode(response.body);
 
-      // Check if waste_items exists and is a List
-      if (data['waste_items'] != null && data['waste_items'] is List) {
-        // Log the waste_items content for debugging
-        print("Parsed waste_items: ${data['waste_items']}");
+        // Check if waste_items exists and is a List
+        if (data['waste_items'] != null && data['waste_items'] is List) {
+          // Log the waste_items content for debugging
+          print("Parsed waste_items: ${data['waste_items']}");
 
-        // Safely map and decode each waste item
-        wasteItems.value = (data['waste_items'] as List).map((e) {
-          try {
-            return WasteItem.fromJson(e);
-          } catch (error) {
-            print("Error parsing waste item: $error, item: $e");
-            return null; // Return null in case of error
+          // Safely map and decode each waste item
+          wasteItems.value = (data['waste_items'] as List)
+              .map((e) {
+                try {
+                  return WasteItem.fromJson(e);
+                } catch (error) {
+                  print("Error parsing waste item: $error, item: $e");
+                  return null; // Return null in case of error
+                }
+              })
+              .where((item) => item != null)
+              .cast<WasteItem>()
+              .toList(); // Filter out null items
+
+          print("Waste items fetched: ${wasteItems.length}");
+
+          // Set the first waste item as the selected one (wasteDetails)
+          if (wasteItems.isNotEmpty) {
+            wasteDetails.value = wasteItems.first; // Assign the first item
+          } else {
+            wasteDetails.value = null; // Handle empty case
           }
-        }).where((item) => item != null).cast<WasteItem>().toList(); // Filter out null items
-
-        print("Waste items fetched: ${wasteItems.length}");
-
-        // Set the first waste item as the selected one (wasteDetails)
-        if (wasteItems.isNotEmpty) {
-          wasteDetails.value = wasteItems.first; // Assign the first item
         } else {
-          wasteDetails.value = null; // Handle empty case
+          print("No waste items found or 'waste_items' is not a list.");
         }
       } else {
-        print("No waste items found or 'waste_items' is not a list.");
+        print("Failed to load waste items: ${response.statusCode}");
+        print('Response body: ${response.body}');
       }
-    } else {
-      print("Failed to load waste items: ${response.statusCode}");
-      print('Response body: ${response.body}');
+    } catch (e) {
+      print("Error fetching waste items: $e");
     }
-  } catch (e) {
-    print("Error fetching waste items: $e");
   }
-}
-
 
   void updateWasteWeight(int newWeight) {
     if (wasteDetails.value != null && newWeight > 0) {
@@ -429,6 +470,20 @@ Future<void> fetchWasteItems() async {
       print("Invalid weight or wasteDetails is null.");
     }
   }
+
+
+RxList<CityName> cities = <CityName>[].obs;
+RxList<StateData> states = <StateData>[].obs;
+
+// Method to get city name by ID
+String getCityName(int cityId) {
+  return cities.firstWhere((city) => city.id == cityId, orElse: () => CityName(id: 0, name: 'Unknown')).name;
+}
+
+// Method to get state name by ID
+String getStateName(int stateId) {
+  return states.firstWhere((state) => state.id == stateId, orElse: () => StateData(id: 0, name: 'Unknown')).name;
+}
 
   Future<void> fetchCities() async {
     final url = Uri.parse("$baseUrl/cities");
@@ -462,33 +517,33 @@ Future<void> fetchWasteItems() async {
   }
 
   Future<void> fetchStates() async {
-  final url = Uri.parse("$baseUrl/states");
+    final url = Uri.parse("$baseUrl/states");
 
-  try {
-    final response = await http.get(url);
+    try {
+      final response = await http.get(url);
 
-    // print('Fetching states from: $url');
-    // print('Response status code: ${response.statusCode}');
-    // print('Response body: ${response.body}'); // Log the full response body
+      // print('Fetching states from: $url');
+      // print('Response status code: ${response.statusCode}');
+      // print('Response body: ${response.body}'); // Log the full response body
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
 
-      // print('Decoded data: $data');
+        // print('Decoded data: $data');
 
-      // Extract the states list from the response
-      List<dynamic> stateList = data['states'];
+        // Extract the states list from the response
+        List<dynamic> stateList = data['states'];
 
-      // Convert the list of maps to a list of StateData objects
-      states.value = stateList.map((state) => StateData.fromJson(state)).toList();
+        // Convert the list of maps to a list of StateData objects
+        states.value =
+            stateList.map((state) => StateData.fromJson(state)).toList();
 
-      // print("States fetched: ${states}");
-    } else {
-      // print("Failed to load data: ${response.statusCode}");
+        // print("States fetched: ${states}");
+      } else {
+        // print("Failed to load data: ${response.statusCode}");
+      }
+    } catch (e) {
+      // print("Error fetching data: $e");
     }
-  } catch (e) {
-    // print("Error fetching data: $e");
   }
-}
-
 }
