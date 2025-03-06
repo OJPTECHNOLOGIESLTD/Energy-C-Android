@@ -65,7 +65,8 @@ Future<void> _savePickupSelection() async {
                       onTap: () {
                         setState(() {
                           _savePickupSelection();
-                          pickedSelection =='home';
+                          pickedSelection ='home';
+                          _selectedOption =1;
                         });
                       },
                     ),
@@ -75,7 +76,8 @@ Future<void> _savePickupSelection() async {
                       onTap: () {
                         setState(() {
                           _savePickupSelection();
-                          pickedSelection =='station';
+                          pickedSelection ='station';
+                          _selectedOption=2;
                         });
                       },
                     ),
