@@ -7,6 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PickUpDetailsPage extends StatefulWidget {
+    final String wasteType;
+  final double weight;
+  final double price;
+  final int wasteId;
+
+  const PickUpDetailsPage({super.key, required this.wasteType, required this.weight, required this.price, required this.wasteId,});
   @override
   _PickUpDetailsPageState createState() => _PickUpDetailsPageState();
 }
@@ -89,7 +95,9 @@ Future<void> _savePickupSelection() async {
               AnimatedSwitcher(
                 duration: Duration(milliseconds: 300),
                 child: _selectedOption == 1
-                    ? HomePickupDetails()
+                    ? HomePickupDetails(actionType1: false,
+                    wasteType: widget.wasteType,
+                    weight: widget.weight, price: widget.price, wasteId: widget.wasteId,)
                     : StationPickupDetails(),
               ),
             ],

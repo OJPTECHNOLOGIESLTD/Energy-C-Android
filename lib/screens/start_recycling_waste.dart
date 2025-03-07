@@ -147,7 +147,7 @@ class PageviewItem extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => RecyclingPage(
           wasteType: wasteItem.name,
-          actionType1: false,
+          actionType1: false, weight: wasteItem.weight, price: wasteItem.price, wasteId: wasteItem.id,
         ),
       ),
     );

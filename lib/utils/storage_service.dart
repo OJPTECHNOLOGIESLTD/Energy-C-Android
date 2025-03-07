@@ -24,30 +24,35 @@ class StorageService {
   }
 
 
-  // Load pickup details
-  Future<Map<String, dynamic>> loadPickupDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? pickupAddress = prefs.getString('pickupAddress');
-    String? city = prefs.getString('city');
-    String? state = prefs.getString('state');
-    String? pickupOption = prefs.getString('pickupOption');
-    String? pickupDateStr = prefs.getString('pickupDate'); //pickupOption
-    // String? pickupDate;
-    // if (pickupDateStr != null) {
-    //   pickupDate = DateTime.parse(pickupDateStr);
-    // }
-     int? cityId = prefs.getInt('cityId');
-    int? stateId = prefs.getInt('stateId');
-    return {
-      'pickupAddress': pickupAddress,
-      'city': city,
-      'state': state,
-      'pickupOption':pickupOption,
-      'pickupDate': pickupDateStr,
-      'cityId':cityId,
-      'stateId':stateId,
-    };
+// Load pickup details
+Future<Map<String, dynamic>> loadPickupDetails() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? pickupAddress = prefs.getString('pickupAddress');
+  String? city = prefs.getString('city');
+  String? state = prefs.getString('state');
+  String? pickupOption = prefs.getString('pickupOption');
+  String? pickupDateStr = prefs.getString('pickupDate'); // pickupOption
+  
+  // Properly assign pickupDate as DateTime
+  DateTime? pickupDate;
+  if (pickupDateStr != null) {
+    pickupDate = DateTime.parse(pickupDateStr);
   }
+
+  int? cityId = prefs.getInt('cityId');
+  int? stateId = prefs.getInt('stateId');
+
+  return {
+    'pickupAddress': pickupAddress,
+    'city': city,
+    'state': state,
+    'pickupOption': pickupOption,
+    'pickupDate': pickupDate, // return DateTime directly
+    'cityId': cityId,
+    'stateId': stateId,
+  };
+}
+
 
   // Save waste details
   Future<void> saveWasteDetails({

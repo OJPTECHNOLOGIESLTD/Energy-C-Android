@@ -193,7 +193,7 @@ class _OrdersPageState extends State<OrdersPage> {
                           } else if (pending && order.status == 'Pending') {
                             return OrderCard(
                               materialType: order.wasteItems
-                                  .map((item) => item.category)
+                                  .map((item) => item.name)
                                   .join(', '), // Join names of waste items
                               orderId: order.orderId,
                               status: order.status,

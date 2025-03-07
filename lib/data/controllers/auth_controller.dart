@@ -151,23 +151,6 @@ class AuthController extends GetxController {
     }
   }
 
-  // Method to get waste name by ID
-RxList<WasteItem> wasteItemName = <WasteItem>[].obs;
-
-String getWasteName(int wasteItemId) {
-  return wasteItemName.firstWhere(
-    (wasteItem) => wasteItem.id == wasteItemId,
-    orElse: () => WasteItem(
-      id: 0,
-      name: 'Unknown', 
-      price: 0, // Default value
-      weight: 0, // Default value
-      image: [], // Default empty list
-      video: [], // Default empty list
-      instructions: [] // Default empty list
-    ),
-  ).name;
-}
 
   Future<List<Order>> fetchOrders(int userId) async {
     try {
@@ -404,7 +387,18 @@ print('${response.body}');
     }
   }
 
-  var wasteItems = <WasteItem>[].obs; // Store multiple waste items
+  RxList<WasteItem> wasteItems = <WasteItem>[].obs; // Store multiple waste items
+  
+  String getWasteName(int wasteItemsId) {
+  return wasteItems.firstWhere((city) => city.id == wasteItemsId, orElse: () => WasteItem(
+    id: 0, name: 'Unknown',
+    price: 0, weight: 0,
+    image: [],
+    video: [],
+    instructions: [],
+    )).name;
+}
+
   Future<void> fetchWasteItems() async {
     final url = Uri.parse("$baseUrl/waste-items");
 

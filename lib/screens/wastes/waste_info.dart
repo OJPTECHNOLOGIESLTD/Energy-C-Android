@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class WasteInfoCard extends StatelessWidget {
   final String wasteType;
+  final int wasteId;
   final int weight;
   final int estimatedIncome;
   final VoidCallback editWasteDetails;
@@ -16,7 +17,7 @@ class WasteInfoCard extends StatelessWidget {
     required this.estimatedIncome,
     required this.editWasteDetails,
     required this.removeWasteType,
-    required this.pickupDate,
+    required this.pickupDate, required this.wasteId,
   });
 
   @override
@@ -55,11 +56,11 @@ class WasteInfoCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      TextButton(
-                        onPressed: () => _editWasteDetails(context),
-                        child: Text('Edit',
-                            style: TextStyle(color: Customcolors.white)),
-                      ),
+                      // TextButton(
+                      //   onPressed: () => _editWasteDetails(context),
+                      //   child: Text('Edit',
+                      //       style: TextStyle(color: Customcolors.white)),
+                      // ),
                       TextButton(
                         onPressed: removeWasteType,
                         child: Text('Remove',
@@ -164,13 +165,6 @@ class WasteInfoCard extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   showWeightDialog(context);
-                },
-              ),
-              ListTile(
-                title: Text('Edit Pickup Date'),
-                onTap: () {
-                  Navigator.pop(context);
-                  showDatePickerDialog(context);
                 },
               ),
             ],

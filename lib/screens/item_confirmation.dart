@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:energy_chleen/data/controllers/api_service.dart';
-import 'package:energy_chleen/data/controllers/auth_controller.dart';
+import 'package:energy_chleen/model/models.dart';
 import 'package:energy_chleen/screens/navbar/appbars.dart';
 import 'package:energy_chleen/utils/Helper.dart';
 import 'package:energy_chleen/utils/storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 
 class ItemConfirmation extends StatefulWidget {
-  const ItemConfirmation({super.key});
+  final RxList<WasteItem> wasteItemsArrey;
+  const ItemConfirmation({super.key, required this.wasteItemsArrey});
 
   @override
   State<ItemConfirmation> createState() => _ItemConfirmationState();
@@ -19,6 +21,23 @@ class ItemConfirmation extends StatefulWidget {
 
 class _ItemConfirmationState extends State<ItemConfirmation> {
   bool isLoading =false;
+
+    // Declare formattedWasteItems at the class level
+  List<Map<String, dynamic>> formattedWasteItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize formattedWasteItems in initState
+    formattedWasteItems = widget.wasteItemsArrey.map((wasteItem) {
+      return {
+        "waste_item_id": wasteItem.id, // Use the id from WasteItem
+        "name": wasteItem.name, // Use the name from WasteItem
+        "totalWeight": wasteItem.weight // Use the weight from WasteItem
+      };
+    }).toList();
+  }
 
 // load save data from shared
 
@@ -31,12 +50,9 @@ Future<void> _loadScheduleData() async {
     StorageService storageService = StorageService();
 
     // Load pickup details and waste details
-    Map<String, dynamic> wasteItems =
-        await storageService.loadWasteItem();
     Map<String, dynamic> pickupDetails =
         await storageService.loadPickupDetails();
-    Map<String, dynamic> wasteDetails =
-        await storageService.loadWasteDetails();
+
 
     int? cityId = pickupDetails['cityId'] is int
         ? pickupDetails['cityId']
@@ -52,21 +68,17 @@ Future<void> _loadScheduleData() async {
     }
 
 await ApiService.instance.createPost(
-  date: pickupDetails['pickupDate'],
+  date: pickupDetails['pickupDate'].toString(),
   address: pickupDetails['pickupAddress'],
   cityId: cityId,
   stateId: stateId,
   pickupType: 'Home', //pickupDetails['pickupOption']
-  wasteItems: [
-    {
-      "waste_item_id": AuthController.instance.wasteDetails.value!.id,
-      "name": wasteItems['wasteType'],
-      "totalWeight": wasteDetails['weight']
-    },
-  ],
+  wasteItems: formattedWasteItems, // Use the mapped list
   images: _imageFiles,
-  videos: _videoFiles, context: context,
+  videos: _videoFiles, 
+  context: context,
 );
+
 
 
     setState(() {
@@ -318,7 +330,7 @@ SizedBox(
 
                     // Show the Finish button only if 4 photos are taken
                     Visibility(
-                      visible: _imageFiles.length >= 4,
+                      visible: _imageFiles.length >= 1,
                       child: GestureDetector(
                         onTap: () {
                           // Handle finish action
